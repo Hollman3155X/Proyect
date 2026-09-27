@@ -1,0 +1,2669 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PROJECT Manager</title>
+<link rel="icon" type="image/png" href="icono.png?v=6">
+<link rel="apple-touch-icon" href="icono.png?v=6">
+<link rel="manifest" href="manifest.json?v=6">
+<meta name="theme-color" content="#0f172a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: { extend: {
+      colors: { slate: { 850: '#151c2c', 900: '#0f172a', 950: '#090d16' } },
+      fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'] }
+    }}
+  };
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  body{font-family:'Inter',sans-serif;}
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:#334155;border-radius:9999px;}
+  ::-webkit-scrollbar-thumb:hover{background:#475569;}
+  [draggable=true]{cursor:grab;}
+  [draggable=true]:active{cursor:grabbing;}
+  .dragging{opacity:.4;}
+  .kcol.dragover{outline:2px dashed #6366f1;outline-offset:-2px;}
+  .cal-day{min-height:104px;}
+  .fade-in{animation:fadeIn .25s ease-out;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+
+  html:not(.dark) body { background:#f1f5f9; color:#0f172a; }
+  html:not(.dark) ::-webkit-scrollbar-thumb { background:#cbd5e1; }
+  html:not(.dark) ::-webkit-scrollbar-thumb:hover { background:#94a3b8; }
+  html:not(.dark) .bg-slate-950 { background:#f1f5f9 !important; }
+  html:not(.dark) .bg-slate-950\/60 { background:rgba(241,245,249,.7) !important; }
+  html:not(.dark) .bg-slate-950\/80 { background:rgba(241,245,249,.95) !important; }
+  html:not(.dark) .bg-slate-950\/40 { background:rgba(241,245,249,.6) !important; }
+  html:not(.dark) .bg-slate-900 { background:#ffffff !important; }
+  html:not(.dark) .bg-slate-900\/85 { background:rgba(255,255,255,.95) !important; }
+  html:not(.dark) .bg-slate-900\/80 { background:rgba(255,255,255,.95) !important; }
+  html:not(.dark) .bg-slate-900\/60 { background:rgba(255,255,255,.75) !important; }
+  html:not(.dark) .bg-slate-900\/50 { background:rgba(255,255,255,.7) !important; }
+  html:not(.dark) .bg-slate-900\/40 { background:rgba(255,255,255,.6) !important; }
+  html:not(.dark) .bg-slate-800 { background:#e2e8f0 !important; }
+  html:not(.dark) .bg-slate-800\/60 { background:rgba(226,232,240,.6) !important; }
+  html:not(.dark) .bg-slate-800\/80 { background:rgba(226,232,240,.8) !important; }
+  html:not(.dark) .bg-black { background:#f8fafc !important; }
+  html:not(.dark) .bg-black\/70 { background:rgba(15,23,42,.4) !important; }
+  html:not(.dark) .bg-slate-950\/50 { background:rgba(241,245,249,.6) !important; }
+  html:not(.dark) .text-white { color:#0f172a !important; }
+  html:not(.dark) .text-slate-100 { color:#0f172a !important; }
+  html:not(.dark) .text-slate-200 { color:#1e293b !important; }
+  html:not(.dark) .text-slate-300 { color:#334155 !important; }
+  html:not(.dark) .text-slate-400 { color:#64748b !important; }
+  html:not(.dark) .text-slate-500 { color:#64748b !important; }
+  html:not(.dark) .text-slate-600 { color:#475569 !important; }
+  html:not(.dark) .placeholder-slate-600::placeholder { color:#94a3b8 !important; }
+  html:not(.dark) .placeholder-slate-500::placeholder { color:#94a3b8 !important; }
+  html:not(.dark) .border-slate-800 { border-color:#cbd5e1 !important; }
+  html:not(.dark) .border-slate-800\/80 { border-color:rgba(203,213,225,.8) !important; }
+  html:not(.dark) .border-slate-800\/60 { border-color:rgba(203,213,225,.6) !important; }
+  html:not(.dark) .border-slate-700 { border-color:#cbd5e1 !important; }
+  html:not(.dark) .border-white\/10 { border-color:rgba(0,0,0,.08) !important; }
+  html:not(.dark) .divide-slate-800\/60 > * + * { border-color:rgba(203,213,225,.6) !important; }
+  html:not(.dark) .hover\:bg-slate-800:hover { background:#e2e8f0 !important; }
+  html:not(.dark) .hover\:bg-slate-800\/60:hover { background:rgba(226,232,240,.6) !important; }
+  html:not(.dark) .hover\:bg-slate-800\/30:hover { background:rgba(226,232,240,.5) !important; }
+  html:not(.dark) .hover\:bg-slate-800\/40:hover { background:rgba(226,232,240,.6) !important; }
+  html:not(.dark) .hover\:bg-slate-700:hover { background:#cbd5e1 !important; }
+  html:not(.dark) .hover\:bg-slate-900:hover { background:#f8fafc !important; }
+  html:not(.dark) .hover\:text-white:hover { color:#0f172a !important; }
+  html:not(.dark) .from-slate-900 { --tw-gradient-from:#ffffff !important; --tw-gradient-to:#ffffff !important; }
+  html:not(.dark) .via-slate-900 { --tw-gradient-stops:#ffffff, #f8fafc, #f1f5f9 !important; }
+  html:not(.dark) .to-slate-950 { --tw-gradient-to:#f1f5f9 !important; }
+  html:not(.dark) .from-slate-900.to-slate-800 { --tw-gradient-from:#e2e8f0 !important; --tw-gradient-to:#f1f5f9 !important; }
+  html:not(.dark) #sidebar-panel { background:#ffffff; border-color:#e2e8f0; }
+  html:not(.dark) header { background:rgba(255,255,255,.8) !important; border-color:#e2e8f0 !important; }
+  html:not(.dark) .bg-indigo-600,
+  html:not(.dark) .bg-indigo-600 * { background-color:#4f46e5 !important; }
+  html:not(.dark) .bg-indigo-600 { color:#ffffff !important; }
+  html:not(.dark) .bg-indigo-600 .text-white,
+  html:not(.dark) .bg-indigo-600 span,
+  html:not(.dark) .bg-indigo-600 svg { color:#ffffff !important; background:transparent !important; }
+  html:not(.dark) .hover\:bg-indigo-500:hover { background:#6366f1 !important; }
+  html:not(.dark) .bg-indigo-500\/10 { background:rgba(99,102,241,.15) !important; }
+  html:not(.dark) .bg-indigo-500\/15 { background:rgba(99,102,241,.15) !important; }
+  html:not(.dark) .text-indigo-300 { color:#4338ca !important; }
+  html:not(.dark) .border-indigo-500\/30 { border-color:rgba(99,102,241,.4) !important; }
+  html:not(.dark) .ring-indigo-500\/30 { --tw-ring-color:rgba(99,102,241,.3) !important; }
+  html:not(.dark) .bg-emerald-950 { background:#d1fae5 !important; }
+  html:not(.dark) .bg-emerald-950\/60 { background:rgba(209,250,229,.7) !important; }
+  html:not(.dark) .text-emerald-300 { color:#065f46 !important; }
+  html:not(.dark) .text-emerald-400 { color:#059669 !important; }
+  html:not(.dark) .border-emerald-900 { border-color:#6ee7b7 !important; }
+  html:not(.dark) .border-emerald-900\/50 { border-color:rgba(110,231,183,.6) !important; }
+  html:not(.dark) .bg-red-950 { background:#fee2e2 !important; }
+  html:not(.dark) .bg-red-950\/60 { background:rgba(254,226,226,.7) !important; }
+  html:not(.dark) .bg-red-950\/40 { background:rgba(254,226,226,.5) !important; }
+  html:not(.dark) .text-red-300 { color:#991b1b !important; }
+  html:not(.dark) .text-red-400 { color:#dc2626 !important; }
+  html:not(.dark) .text-red-200 { color:#7f1d1d !important; }
+  html:not(.dark) .border-red-900 { border-color:#fca5a5 !important; }
+  html:not(.dark) .border-red-900\/50 { border-color:rgba(252,165,165,.6) !important; }
+  html:not(.dark) .bg-red-600 { background:#dc2626 !important; }
+  html:not(.dark) .bg-amber-950 { background:#fef3c7 !important; }
+  html:not(.dark) .bg-amber-950\/60 { background:rgba(254,243,199,.7) !important; }
+  html:not(.dark) .text-amber-300 { color:#92400e !important; }
+  html:not(.dark) .text-amber-400 { color:#d97706 !important; }
+  html:not(.dark) .border-amber-900 { border-color:#fcd34d !important; }
+  html:not(.dark) .bg-blue-950 { background:#dbeafe !important; }
+  html:not(.dark) .bg-blue-950\/60 { background:rgba(219,234,254,.7) !important; }
+  html:not(.dark) .text-blue-300 { color:#1e40af !important; }
+  html:not(.dark) .text-blue-400 { color:#2563eb !important; }
+  html:not(.dark) .border-blue-900 { border-color:#93c5fd !important; }
+  html:not(.dark) .border-blue-900\/50 { border-color:rgba(147,197,253,.6) !important; }
+  html:not(.dark) #search-dropdown,
+  html:not(.dark) #notif-panel { background:#ffffff; border-color:#e2e8f0; }
+  html:not(.dark) #notif-panel .border-slate-800 { border-color:#e2e8f0 !important; }
+  html:not(.dark) #modal-root > div { background:#ffffff; border-color:#e2e8f0; }
+
+  .logo-on-dark { display: block; }
+  .logo-on-light { display: none; }
+  html:not(.dark) .logo-on-dark { display: none; }
+  html:not(.dark) .logo-on-light { display: block; }
+
+  .realtime-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #94a3b8;
+    transition: background .3s;
+    display: inline-block;
+  }
+  .realtime-dot.connected { background: #10b981; box-shadow: 0 0 6px #10b98188; }
+  .realtime-dot.disconnected { background: #ef4444; }
+  .realtime-dot.connecting { background: #f59e0b; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+
+  .toast-rt {
+    background: linear-gradient(135deg, #1e3a8a, #1e40af) !important;
+    color: #fff !important;
+    border-color: #3b82f6 !important;
+  }
+
+  .login-bg { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none; }
+  .login-bg .blob { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .55; will-change: transform; }
+  .login-bg .blob-1 { width: 520px; height: 520px; background: radial-gradient(circle, #6366f1, transparent 70%); top: -160px; left: -160px; animation: blobFloat1 18s ease-in-out infinite; }
+  .login-bg .blob-2 { width: 460px; height: 460px; background: radial-gradient(circle, #8b5cf6, transparent 70%); bottom: -140px; right: -140px; animation: blobFloat2 22s ease-in-out infinite; }
+  .login-bg .blob-3 { width: 400px; height: 400px; background: radial-gradient(circle, #0ea5e9, transparent 70%); top: 35%; left: 50%; animation: blobFloat3 20s ease-in-out infinite; opacity: .35; }
+  .login-bg .grid-lines {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(99,102,241,.09) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,102,241,.09) 1px, transparent 1px);
+    background-size: 50px 50px;
+    -webkit-mask-image: radial-gradient(circle at center, black 25%, transparent 75%);
+    mask-image: radial-gradient(circle at center, black 25%, transparent 75%);
+    animation: gridMove 30s linear infinite;
+  }
+  .login-bg .particle {
+    position: absolute; bottom: -10px; width: 4px; height: 4px;
+    background: #818cf8; border-radius: 50%; box-shadow: 0 0 8px #818cf8;
+    opacity: 0; animation: rise linear infinite;
+  }
+  .login-bg .vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,.55) 100%); }
+  html:not(.dark) .login-bg .vignette { background: radial-gradient(ellipse at center, transparent 30%, rgba(148,163,184,.35) 100%); }
+
+  @keyframes blobFloat1 { 0%,100%{transform:translate(0,0) scale(1);} 33%{transform:translate(90px,60px) scale(1.1);} 66%{transform:translate(-40px,110px) scale(.95);} }
+  @keyframes blobFloat2 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-90px,-70px) scale(1.15);} }
+  @keyframes blobFloat3 { 0%,100%{transform:translate(0,0) scale(1);} 40%{transform:translate(70px,-90px) scale(.9);} 70%{transform:translate(-60px,50px) scale(1.05);} }
+  @keyframes gridMove { from{background-position:0 0,0 0;} to{background-position:50px 50px,50px 50px;} }
+  @keyframes rise { 0%{transform:translateY(0);opacity:0;} 15%{opacity:.8;} 85%{opacity:.8;} 100%{transform:translateY(-100vh);opacity:0;} }
+  @keyframes titleGlow { 0%,100%{filter:drop-shadow(0 0 18px rgba(99,102,241,.35));} 50%{filter:drop-shadow(0 0 30px rgba(139,92,246,.55));} }
+  .login-logo { animation: titleGlow 5s ease-in-out infinite; }
+
+  html:not(.dark) .login-bg .blob { opacity: .30; }
+  html:not(.dark) .login-bg .grid-lines { background-image: linear-gradient(rgba(99,102,241,.16) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,.16) 1px, transparent 1px); }
+  html:not(.dark) .login-bg .particle { background: #6366f1; box-shadow: 0 0 8px #6366f1; }
+
+  #app-view { position: relative; }
+  .app-ambient { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .app-ambient .amb-1 { position: absolute; top: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(99,102,241,.10), transparent 70%); filter: blur(80px); animation: ambFloat 30s ease-in-out infinite; }
+  .app-ambient .amb-2 { position: absolute; bottom: -250px; left: -200px; width: 550px; height: 550px; background: radial-gradient(circle, rgba(139,92,246,.08), transparent 70%); filter: blur(80px); animation: ambFloat 35s ease-in-out infinite reverse; }
+  .app-ambient .amb-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(99,102,241,.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(99,102,241,.035) 1px, transparent 1px);
+    background-size: 60px 60px;
+    -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 80%);
+    mask-image: radial-gradient(ellipse at center, black 20%, transparent 80%);
+  }
+  @keyframes ambFloat { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-60px,60px) scale(1.1);} }
+  html:not(.dark) .app-ambient .amb-1 { background: radial-gradient(circle, rgba(99,102,241,.13), transparent 70%); }
+  html:not(.dark) .app-ambient .amb-2 { background: radial-gradient(circle, rgba(139,92,246,.10), transparent 70%); }
+  html:not(.dark) .app-ambient .amb-grid { background-image: linear-gradient(rgba(99,102,241,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,.06) 1px, transparent 1px); }
+
+  .app-header {
+    background: linear-gradient(180deg, rgba(15,23,42,.85) 0%, rgba(15,23,42,.65) 100%) !important;
+    border-bottom: 1px solid transparent !important;
+    background-clip: padding-box;
+    position: relative;
+  }
+  .app-header::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(99,102,241,.4) 30%, rgba(139,92,246,.4) 70%, transparent);
+    pointer-events: none;
+  }
+  html:not(.dark) .app-header { background: linear-gradient(180deg, rgba(255,255,255,.95) 0%, rgba(255,255,255,.8) 100%) !important; }
+  html:not(.dark) .app-header::after { background: linear-gradient(90deg, transparent, rgba(99,102,241,.35) 30%, rgba(139,92,246,.35) 70%, transparent); }
+
+  #sidebar-panel {
+    background: linear-gradient(180deg, #0f172a 0%, #0b1220 100%) !important;
+  }
+  @media (min-width: 768px) {
+    #sidebar-panel { position: relative; }
+  }
+  html:not(.dark) #sidebar-panel { background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important; }
+  #sidebar-panel .logo-on-dark, #sidebar-panel .logo-on-light { filter: drop-shadow(0 0 12px rgba(99,102,241,.25)); }
+
+  .nav-btn.bg-indigo-500\/15 {
+    background: linear-gradient(90deg, rgba(99,102,241,.20) 0%, rgba(99,102,241,.10) 100%) !important;
+    box-shadow: 0 4px 20px -6px rgba(99,102,241,.5), inset 0 1px 0 rgba(255,255,255,.05);
+    border-left: 3px solid #6366f1;
+  }
+
+  .ui-card {
+    position: relative;
+    background: rgba(15,23,42,.85);
+    border: 1px solid rgba(30,41,59,1);
+    transition: all .3s cubic-bezier(.4,0,.2,1);
+  }
+  .ui-card::before {
+    content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px;
+    background: linear-gradient(135deg, rgba(99,102,241,.5), rgba(139,92,246,.3), transparent 60%);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    opacity: 0; transition: opacity .3s; pointer-events: none;
+  }
+  .ui-card:hover::before { opacity: 1; }
+  .ui-card:hover { box-shadow: 0 20px 40px -20px rgba(99,102,241,.35); transform: translateY(-2px); }
+  html:not(.dark) .ui-card { background: #ffffff; border-color: #e2e8f0; }
+  html:not(.dark) .ui-card:hover { box-shadow: 0 20px 40px -20px rgba(99,102,241,.28); }
+
+  .ui-view-header {
+    position: relative; overflow: hidden;
+    background: linear-gradient(135deg, rgba(15,23,42,.92) 0%, rgba(15,23,42,.75) 100%);
+  }
+  .ui-view-header::before {
+    content: ''; position: absolute; top: -50px; right: -50px; width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(99,102,241,.15), transparent 70%);
+    filter: blur(40px); pointer-events: none;
+  }
+  html:not(.dark) .ui-view-header { background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); }
+
+  .btn-glow { position: relative; transition: all .25s; }
+  .btn-glow:hover { box-shadow: 0 8px 28px -8px rgba(99,102,241,.7), 0 0 0 1px rgba(99,102,241,.4); transform: translateY(-1px); }
+  .btn-glow:active { transform: translateY(0); }
+
+  .stat-number {
+    background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.03em;
+  }
+  html:not(.dark) .stat-number {
+    background: linear-gradient(135deg, #1e293b 0%, #4338ca 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .kcol { background: linear-gradient(180deg, rgba(15,23,42,.6) 0%, rgba(15,23,42,.4) 100%) !important; position: relative; overflow: hidden; }
+  .kcol::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, rgba(99,102,241,.7), transparent); opacity: .6; }
+  html:not(.dark) .kcol { background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%) !important; }
+
+  .ktask { transition: all .2s; }
+  .ktask:hover { box-shadow: 0 8px 20px -10px rgba(0,0,0,.5), 0 0 0 1px rgba(99,102,241,.2); transform: translateY(-1px); }
+
+  .ui-badge { box-shadow: inset 0 1px 0 rgba(255,255,255,.06); }
+
+  ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #334155, #1e293b); }
+  ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #6366f1, #4f46e5); }
+
+  .tab-view:not(.hidden) { animation: tabIn .35s cubic-bezier(.4,0,.2,1); }
+  @keyframes tabIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
+
+  input:focus, select:focus, textarea:focus {
+    box-shadow: 0 0 0 3px rgba(99,102,241,.15), 0 0 20px -4px rgba(99,102,241,.4) !important;
+  }
+
+  table { min-width: 520px; }
+  .ui-card > .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+
+  @media (max-width: 640px){
+    .cal-day{ min-height: 72px; padding: 6px !important; }
+    .cal-day > div:first-child{ font-size: 10px !important; }
+    .cal-day .text-\[10px\]{ font-size: 9px !important; padding: 2px 4px !important; }
+    .ui-view-header > div:last-child{ width: 100%; }
+    .ui-view-header > div:last-child > .flex,
+    .ui-view-header > div:last-child{ flex-wrap: wrap; }
+    .ui-card.p-8{ padding: 1.25rem !important; }
+    .ui-view-header{ padding: 1.25rem !important; }
+  }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased flex flex-col selection:bg-indigo-500 selection:text-white" style="height:100vh; height:100dvh; overflow:hidden;">
+
+<div id="login-view" class="fixed inset-0 z-50 bg-black flex items-center justify-center p-4 overflow-hidden">
+
+  <div class="login-bg" aria-hidden="true">
+    <div class="grid-lines"></div>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="particle" style="left:6%;  animation-duration:14s; animation-delay:0s;"></div>
+    <div class="particle" style="left:15%; animation-duration:18s; animation-delay:2s;"></div>
+    <div class="particle" style="left:26%; animation-duration:12s; animation-delay:5s;"></div>
+    <div class="particle" style="left:38%; animation-duration:20s; animation-delay:1s;"></div>
+    <div class="particle" style="left:52%; animation-duration:16s; animation-delay:7s;"></div>
+    <div class="particle" style="left:63%; animation-duration:13s; animation-delay:3s;"></div>
+    <div class="particle" style="left:74%; animation-duration:19s; animation-delay:6s;"></div>
+    <div class="particle" style="left:86%; animation-duration:15s; animation-delay:4s;"></div>
+    <div class="particle" style="left:94%; animation-duration:17s; animation-delay:8s;"></div>
+    <div class="vignette"></div>
+  </div>
+
+  <button onclick="toggleTheme()" id="login-theme-btn" title="Cambiar tema"
+    class="absolute top-5 right-5 w-12 h-12 rounded-2xl bg-slate-900/80 backdrop-blur-md border border-slate-800 flex items-center justify-center text-slate-300 hover:bg-slate-800 transition shadow-lg text-xl z-20">
+    🌙
+  </button>
+
+  <div class="relative z-10 max-w-md w-full bg-slate-900/75 backdrop-blur-2xl border border-slate-800/80 rounded-3xl p-8 sm:p-10 shadow-[0_20px_80px_-20px_rgba(99,102,241,0.35)] space-y-8 overflow-hidden fade-in">
+    <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-indigo-400/70 to-transparent"></div>
+    <div class="absolute -top-24 -right-24 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="text-center space-y-5 relative">
+      <div class="flex justify-center py-2">
+        <img src="logo-blanco.png" alt="PROJECT" class="login-logo logo-on-dark h-24 sm:h-28 w-auto object-contain select-none pointer-events-none">
+        <img src="logo-negro.png" alt="PROJECT" class="logo-on-light h-24 sm:h-28 w-auto object-contain select-none pointer-events-none">
+      </div>
+      <div>
+        <p class="text-sm text-slate-400 mt-1">Plataforma interna de control y gestión</p>
+        <div class="mt-3 flex items-center justify-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-[10px] font-semibold text-emerald-300 uppercase tracking-[0.2em]">Sistema en línea</span>
+        </div>
+      </div>
+    </div>
+    <form id="login-form" onsubmit="doLogin(event)" class="space-y-5 relative">
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Correo Electrónico</label>
+        <input type="email" id="login-email" required placeholder="tu@email.com" class="w-full px-4 py-3.5 bg-slate-950/60 border border-slate-800 rounded-2xl text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition shadow-inner">
+      </div>
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Contraseña</label>
+        <input type="password" id="login-pass" required placeholder="••••••••" class="w-full px-4 py-3.5 bg-slate-950/60 border border-slate-800 rounded-2xl text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition shadow-inner">
+      </div>
+      <label class="flex items-center gap-2.5 cursor-pointer select-none">
+        <input type="checkbox" id="login-remember" class="w-4 h-4 rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-2 focus:ring-indigo-500/50 focus:ring-offset-0" style="accent-color:#4f46e5;">
+        <span class="text-sm text-slate-300">Recordarme en este dispositivo</span>
+      </label>
+      <div id="login-error" class="hidden p-3.5 bg-red-950/40 border border-red-900/50 rounded-2xl text-xs text-red-400 text-center font-medium">Correo o contraseña incorrectos.</div>
+      <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-2xl text-sm shadow-lg shadow-indigo-900/40 active:scale-[0.98] transition">Iniciar Sesión</button>
+    </form>
+    <div class="text-center pt-4 border-t border-slate-800/60 space-y-1 relative">
+      <p class="text-xs text-slate-500">Crea una cuenta o pide acceso al administrador.</p>
+    </div>
+  </div>
+</div>
+
+<div id="app-view" class="hidden flex-1 flex flex-col md:flex-row overflow-hidden min-h-0">
+  <div class="app-ambient" aria-hidden="true">
+    <div class="amb-grid"></div>
+    <div class="amb-1"></div>
+    <div class="amb-2"></div>
+  </div>
+
+  <aside id="sidebar-panel" class="fixed md:relative inset-y-0 left-0 z-50 w-72 bg-slate-900 border-r border-slate-800 flex flex-col h-full select-none shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+    <div class="px-6 py-5 border-b border-slate-800 flex items-center justify-between shrink-0">
+      <div class="flex items-center">
+        <img src="logo-blanco.png" alt="PROJECT" class="logo-on-dark h-9 w-auto object-contain select-none pointer-events-none">
+        <img src="logo-negro.png" alt="PROJECT" class="logo-on-light h-9 w-auto object-contain select-none pointer-events-none">
+      </div>
+      <button onclick="toggleMobileSidebar()" class="md:hidden p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition">✕</button>
+    </div>
+    <nav class="flex-1 min-h-0 overflow-y-auto px-4 py-5 space-y-1.5" id="sidebar-nav"></nav>
+    <div class="p-4 border-t border-slate-800 bg-slate-950/40 flex items-center justify-between gap-3 shrink-0">
+      <div class="flex items-center space-x-3 min-w-0 flex-1">
+        <div id="user-avatar" class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-indigo-500 flex items-center justify-center font-bold text-white text-sm shadow-sm shrink-0">?</div>
+        <div class="min-w-0 flex-1">
+          <p id="user-name-display" class="text-sm font-semibold text-white truncate">—</p>
+          <p id="user-role-display" class="text-[11px] text-slate-400 font-medium tracking-wide uppercase truncate">—</p>
+        </div>
+      </div>
+      <button onclick="doLogout()" title="Cerrar sesión" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-300 bg-slate-800/60 hover:bg-red-600 hover:text-white border border-slate-700 hover:border-red-500 transition text-xs font-semibold shrink-0">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        <span>Salir</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="flex-1 flex flex-col overflow-hidden min-w-0 min-h-0">
+    <header class="app-header h-20 backdrop-blur-xl px-3 sm:px-6 lg:px-8 flex items-center justify-between shrink-0 relative z-40 gap-2 sm:gap-3">
+      <div class="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+        <button onclick="toggleMobileSidebar()" class="md:hidden p-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 transition shrink-0">☰</button>
+        <div class="relative w-full">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </span>
+          <input type="text" id="global-search" oninput="doSearch(this.value)" placeholder="Buscar..." class="w-full pl-10 pr-4 py-2.5 bg-slate-950/80 border border-slate-800 rounded-2xl text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition shadow-inner">
+          <div id="search-dropdown" class="hidden absolute left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-50 max-h-96 overflow-y-auto fade-in"></div>
+        </div>
+      </div>
+      <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+        <div id="realtime-indicator" class="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-[10px] font-semibold text-slate-400 uppercase tracking-wider" title="Estado de conexión en vivo">
+          <span id="realtime-dot" class="realtime-dot connecting"></span>
+          <span id="realtime-label">Conectando</span>
+        </div>
+        <div class="relative">
+          <button onclick="toggleNotifPanel(event)" class="w-10 h-10 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-300 hover:bg-slate-800 transition shadow-sm relative">
+            🔔
+            <span id="notif-badge" class="absolute -top-1 -right-1 w-5 h-5 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-md hidden">0</span>
+          </button>
+          <div id="notif-panel" class="hidden absolute right-0 mt-3 w-80 max-w-[calc(100vw-1.5rem)] bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl p-4 space-y-3 z-50 fade-in">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+              <h4 class="font-bold text-white text-sm">Notificaciones</h4>
+              <span class="text-xs text-slate-400 font-semibold cursor-pointer hover:text-white" onclick="closeNotifPanel()">Cerrar</span>
+            </div>
+            <div id="notif-list" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
+          </div>
+        </div>
+        <button onclick="toggleTheme()" id="theme-toggle-btn" class="w-10 h-10 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-300 hover:bg-slate-800 transition shadow-sm text-base" title="Cambiar tema">🌙</button>
+        <button onclick="openQuickCreate()" class="btn-glow hidden sm:flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs font-semibold shadow-lg shadow-indigo-900/40 transition">
+          <span>+ Nuevo</span>
+        </button>
+        <div class="hidden xl:block text-right pl-3 border-l border-slate-800">
+          <p class="text-xs font-bold text-white flex items-center space-x-1.5 justify-end">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span id="header-user-name">—</span>
+          </p>
+          <p class="text-[11px] text-slate-400 capitalize" id="current-date"></p>
+        </div>
+      </div>
+    </header>
+
+    <main class="flex-1 min-h-0 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+      <div class="w-full">
+        <div id="view-dashboard" class="tab-view space-y-6 sm:space-y-8"></div>
+        <div id="view-clientes" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-empresas" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-servicios" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-pagos" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-proyectos" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-tareas" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-contenido" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-comercial" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-calendario" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-crm" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-archivos" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-notificaciones" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-automatizaciones" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-usuarios" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+        <div id="view-cuenta" class="tab-view hidden space-y-6 sm:space-y-8"></div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<div id="modal-root" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-md hidden items-center justify-center p-4">
+  <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+      <h3 id="modal-title" class="text-lg font-bold text-white">Formulario</h3>
+      <button onclick="closeModal()" class="w-8 h-8 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white transition">✕</button>
+    </div>
+    <form id="modal-form" onsubmit="handleFormSubmit(event)" class="space-y-5">
+      <div id="modal-fields" class="space-y-5"></div>
+      <div class="flex justify-end space-x-3 pt-4 border-t border-slate-800">
+        <button type="button" onclick="closeModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-2xl text-sm font-semibold transition">Cancelar</button>
+        <button type="submit" class="btn-glow px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-sm font-semibold shadow-lg transition">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast-container" class="fixed bottom-6 right-6 z-[100] space-y-3 pointer-events-none"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const REMEMBER_KEY = 'bf_remember_v5';
+const rememberPref = () => {
+  try {
+    const v = localStorage.getItem(REMEMBER_KEY);
+    return v === null ? true : v === 'true';
+  } catch(e) { return true; }
+};
+
+const hybridStorage = {
+  getItem: (key) => {
+    try {
+      if (rememberPref()) return localStorage.getItem(key);
+      return sessionStorage.getItem(key) || localStorage.getItem(key);
+    } catch(e) { return null; }
+  },
+  setItem: (key, value) => {
+    try {
+      if (rememberPref()) { localStorage.setItem(key, value); sessionStorage.removeItem(key); }
+      else { sessionStorage.setItem(key, value); localStorage.removeItem(key); }
+    } catch(e) {}
+  },
+  removeItem: (key) => {
+    try { localStorage.removeItem(key); sessionStorage.removeItem(key); } catch(e) {}
+  }
+};
+
+const SUPABASE_URL = 'https://wuapikyjrmxjgwxzxlle.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind1YXBpa3lqcm14amd3eHp4bGxlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA0MTEyNDUsImV4cCI6MjEwNTk4NzI0NX0.7yUzAejH54BJLZJAoboexptddE1n9uKFEMkmM6HTVLs';
+const EDGE_URL = 'https://wuapikyjrmxjgwxzxlle.supabase.co/functions/v1/admin-users';
+
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { storage: hybridStorage, autoRefreshToken: true, persistSession: true, detectSessionInUrl: false },
+  realtime: { params: { eventsPerSecond: 10 } }
+});
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtMoney = n => '$' + Number(n||0).toLocaleString('es-CO');
+
+const parseMoney = (s) => {
+  if (s === null || s === undefined) return 0;
+  if (typeof s === 'number') return isFinite(s) ? s : 0;
+  let str = String(s).trim();
+  str = str.replace(/[^\d.,-]/g, '');
+  if (str === '' || str === '-' || str === '.' || str === ',') return 0;
+  const hasComma = str.includes(',');
+  const hasDot = str.includes('.');
+  let normalized;
+  if (hasComma && hasDot) {
+    normalized = str.replace(/\./g, '').replace(',', '.');
+  } else if (hasComma) {
+    const parts = str.split(',');
+    if (parts.length === 2 && parts[1].length === 3) normalized = str.replace(',', '');
+    else normalized = str.replace(',', '.');
+  } else {
+    normalized = str;
+  }
+  const num = parseFloat(normalized);
+  return isNaN(num) ? 0 : num;
+};
+
+const addDays = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+
+const todayStr = () => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
+const toLocalDateStr = (d) => {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
+const confirmar = msg => window.confirm(msg);
+
+function hardResetScroll(){
+  try {
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
+    const mv = document.querySelector('main');
+    if(mv) mv.scrollTop = 0;
+    if(document.scrollingElement) document.scrollingElement.scrollTop = 0;
+  } catch(e){}
+}
+
+function isInputFocused(){
+  const a = document.activeElement;
+  if(!a) return false;
+  return a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.tagName === 'SELECT' || a.isContentEditable === true;
+}
+
+function toast(msg, type='success'){
+  const c = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  const icon = type==='success'?'✅':type==='error'?'⚠️':type==='realtime'?'📡':'ℹ️';
+  const cls = type==='error' ? 'bg-red-950 text-red-200 border-red-900/60'
+    : type==='realtime' ? 'toast-rt'
+    : 'bg-slate-900 text-slate-100 border-slate-700';
+  el.className = `pointer-events-auto px-5 py-3.5 rounded-2xl border shadow-2xl backdrop-blur-md text-sm font-semibold flex items-center space-x-3 transition-all duration-300 translate-y-4 opacity-0 ${cls}`;
+  el.innerHTML = `<span>${icon}</span><span>${esc(msg)}</span>`;
+  c.appendChild(el);
+  setTimeout(()=>el.classList.remove('translate-y-4','opacity-0'),10);
+  setTimeout(()=>{el.classList.add('translate-y-4','opacity-0');setTimeout(()=>el.remove(),300);},3000);
+}
+
+function exportCSV(coleccion){
+  const rows = Store.all(coleccion);
+  if(!rows.length){ toast('No hay datos para exportar','error'); return; }
+  const omit = ['created_at','updated_at','created_by'];
+  const cols = Object.keys(rows[0]).filter(k => !omit.includes(k));
+  const header = cols.join(',');
+  const body = rows.map(r => cols.map(c => {
+    let v = r[c];
+    if(v === null || v === undefined) v = '';
+    if(typeof v === 'object') v = JSON.stringify(v);
+    v = String(v).replace(/"/g,'""');
+    return `"${v}"`;
+  }).join(',')).join('\n');
+  const csv = header + '\n' + body;
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${coleccion}_${todayStr()}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  toast('CSV exportado');
+}
+
+function logChange(actor, accion){
+  try{
+    let log = JSON.parse(localStorage.getItem('bf_changelog_v5')||'[]');
+    log.unshift({fecha: new Date().toISOString().slice(0,16).replace('T',' '), actor, accion});
+    log = log.slice(0, 50);
+    localStorage.setItem('bf_changelog_v5', JSON.stringify(log));
+  }catch(e){}
+}
+
+let DB_CACHE = {
+  clientes: [], locales: [], servicios: [], proyectos: [], tareas: [],
+  crm: [], pagos: [], eventos: [], contenido: [], comercial: [], archivos: [], actividad: []
+};
+
+async function loadAllData(){
+  try {
+    const promises = Object.keys(DB_CACHE).map(key =>
+      sb.from(key).select('*').order('created_at', { ascending: false })
+    );
+    const results = await Promise.all(promises);
+    const keys = Object.keys(DB_CACHE);
+    results.forEach((result, i) => {
+      if (result.error) { console.error(`Error cargando ${keys[i]}:`, result.error); DB_CACHE[keys[i]] = []; }
+      else { DB_CACHE[keys[i]] = result.data || []; }
+    });
+  } catch (e) {
+    console.error('Error general cargando datos:', e);
+    toast('Error cargando datos desde Supabase', 'error');
+  }
+}
+
+const Store = {
+  all(c){ return DB_CACHE[c] || []; },
+  find(c,id){ return (DB_CACHE[c] || []).find(x => String(x.id) === String(id)) || null; },
+  async add(c, obj, actor){
+    const t = new Date().toISOString();
+    const record = { ...obj, created_at: t, updated_at: t, created_by: CURRENT_USER?.id || null };
+    const { data, error } = await sb.from(c).insert(record).select().single();
+    if (error) { console.error(`Error insertando en ${c}:`, error); toast(`Error al guardar: ${error.message || 'revisa los datos'}`, 'error'); return null; }
+    if(!DB_CACHE[c].some(x => String(x.id) === String(data.id))) DB_CACHE[c].unshift(data);
+    return data;
+  },
+  async update(c, id, patch, actor){
+    const t = new Date().toISOString();
+    const { data, error } = await sb.from(c).update({ ...patch, updated_at: t }).eq('id', id).select().single();
+    if (error) { console.error(`Error actualizando ${c}:`, error); toast(`Error al actualizar: ${error.message || 'revisa los datos'}`, 'error'); return null; }
+    const idx = DB_CACHE[c].findIndex(x => String(x.id) === String(id));
+    if (idx !== -1) DB_CACHE[c][idx] = data;
+    return data;
+  },
+  async remove(c, id){
+    const { error } = await sb.from(c).delete().eq('id', id);
+    if (error) { console.error(`Error eliminando de ${c}:`, error); toast('Error al eliminar en la base de datos', 'error'); return false; }
+    DB_CACHE[c] = DB_CACHE[c].filter(x => String(x.id) !== String(id));
+    return true;
+  }
+};
+
+const clienteById = id => Store.find('clientes', id);
+const localById = id => Store.find('locales', id);
+const servicioById = id => Store.find('servicios', id);
+const clienteName = id => clienteById(id)?.nombre || '—';
+const localName = id => localById(id)?.nombre || '—';
+const servicioName = id => servicioById(id)?.nombre || '—';
+
+let REALTIME_CHANNEL = null;
+let REALTIME_RENDER_TIMER = null;
+let REALTIME_HEARTBEAT = null;
+const REALTIME_TABLES = ['clientes','locales','servicios','proyectos','tareas','crm','pagos','eventos','contenido','comercial','archivos','actividad'];
+
+function setRealtimeStatus(status){
+  const dot = document.getElementById('realtime-dot');
+  const lbl = document.getElementById('realtime-label');
+  const ind = document.getElementById('realtime-indicator');
+  if(!dot || !lbl) return;
+  dot.classList.remove('connected','disconnected','connecting');
+  if(status === 'connected'){ dot.classList.add('connected'); lbl.textContent = 'En vivo'; if(ind) ind.classList.add('border-emerald-900/50'); }
+  else if(status === 'connecting'){ dot.classList.add('connecting'); lbl.textContent = 'Conectando'; }
+  else { dot.classList.add('disconnected'); lbl.textContent = 'Sin conexión'; }
+}
+
+function initRealtime(){
+  if(REALTIME_CHANNEL) return;
+  if(!CURRENT_USER) return;
+  if(!navigator.onLine){ setRealtimeStatus('disconnected'); return; }
+  setRealtimeStatus('connecting');
+  REALTIME_CHANNEL = sb.channel('project-manager-realtime', { config: { broadcast: { self: false } } });
+  REALTIME_TABLES.forEach(table => {
+    REALTIME_CHANNEL.on('postgres_changes', { event: '*', schema: 'public', table: table }, (payload) => handleRealtimeChange(table, payload));
+  });
+  let _wasConnected = false;
+  REALTIME_CHANNEL.subscribe((status) => {
+    if(status === 'SUBSCRIBED'){
+      setRealtimeStatus('connected');
+      if(_wasConnected === false && sessionStorage.getItem('bf_rt_was_connected')) toast('Conexión en vivo restablecida', 'realtime');
+      sessionStorage.setItem('bf_rt_was_connected','1');
+      _wasConnected = true;
+    } else if(status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED'){
+      setRealtimeStatus('disconnected'); _wasConnected = false;
+    } else { setRealtimeStatus('connecting'); }
+  });
+}
+
+function startRealtimeHeartbeat(){
+  if(REALTIME_HEARTBEAT) return;
+  REALTIME_HEARTBEAT = setInterval(() => {
+    if(!CURRENT_USER) return;
+    if(!navigator.onLine) return;
+    const st = REALTIME_CHANNEL?.state;
+    if(st !== 'joined'){
+      stopRealtime();
+      setTimeout(() => initRealtime(), 500);
+    }
+  }, 30000);
+}
+function stopRealtimeHeartbeat(){ if(REALTIME_HEARTBEAT){ clearInterval(REALTIME_HEARTBEAT); REALTIME_HEARTBEAT = null; } }
+function stopRealtime(){
+  stopRealtimeHeartbeat();
+  if(REALTIME_CHANNEL){ try { sb.removeChannel(REALTIME_CHANNEL); } catch(e){} REALTIME_CHANNEL = null; }
+  setRealtimeStatus('disconnected');
+}
+
+// ────────────────────────────────────────────────────────────
+// PRESENCIA: quién está conectado ahora mismo (solo visible para "dueño")
+// ────────────────────────────────────────────────────────────
+let PRESENCE_CHANNEL = null;
+let PRESENCE_STATE = {};
+
+function initPresence(){
+  if(PRESENCE_CHANNEL) return;
+  if(!CURRENT_USER) return;
+  PRESENCE_CHANNEL = sb.channel('presencia-usuarios', { config: { presence: { key: CURRENT_USER.id } } });
+  PRESENCE_CHANNEL.on('presence', { event: 'sync' }, () => {
+    PRESENCE_STATE = PRESENCE_CHANNEL.presenceState();
+    if(CURRENT_USER?.rol === 'dueño' && document.getElementById('view-usuarios') && !document.getElementById('view-usuarios').classList.contains('hidden')){
+      try { renderUsuarios(); } catch(e){}
+    }
+  });
+  PRESENCE_CHANNEL.subscribe(async (status) => {
+    if(status === 'SUBSCRIBED'){
+      await PRESENCE_CHANNEL.track({ user_id: CURRENT_USER.id, nombre: CURRENT_USER.nombre, conectado_desde: new Date().toISOString() });
+    }
+  });
+}
+function stopPresence(){
+  if(PRESENCE_CHANNEL){ try { sb.removeChannel(PRESENCE_CHANNEL); } catch(e){} PRESENCE_CHANNEL = null; }
+  PRESENCE_STATE = {};
+}
+function presenciaDe(userId){
+  const entradas = PRESENCE_STATE[userId];
+  if(!entradas || !entradas.length) return null;
+  return entradas[0];
+}
+
+function handleRealtimeChange(table, payload){
+  const eventType = payload.eventType;
+  const newRecord = payload.new;
+  const oldRecord = payload.old;
+  const isMyChange = (newRecord && CURRENT_USER && (
+    String(newRecord.created_by) === String(CURRENT_USER.id) ||
+    String(newRecord.updated_by) === String(CURRENT_USER.id) ||
+    String(newRecord.user_id) === String(CURRENT_USER.id)
+  ));
+  if(eventType === 'INSERT'){
+    if(newRecord && !DB_CACHE[table].some(x => String(x.id) === String(newRecord.id))){
+      DB_CACHE[table].unshift(newRecord);
+      if(!isMyChange && table !== 'actividad') showRealtimeToast(`${displayName(table, newRecord)} fue creado por otro usuario`);
+    }
+  } else if(eventType === 'UPDATE'){
+    if(newRecord){
+      const idx = DB_CACHE[table].findIndex(x => String(x.id) === String(newRecord.id));
+      if(idx !== -1){
+        DB_CACHE[table][idx] = newRecord;
+        if(!isMyChange && table !== 'actividad') showRealtimeToast(`${displayName(table, newRecord)} fue actualizado por otro usuario`);
+      }
+    }
+  } else if(eventType === 'DELETE'){
+    if(oldRecord){
+      const existed = DB_CACHE[table].some(x => String(x.id) === String(oldRecord.id));
+      DB_CACHE[table] = DB_CACHE[table].filter(x => String(x.id) !== String(oldRecord.id));
+      if(existed && !isMyChange && table !== 'actividad') showRealtimeToast(`Un registro fue eliminado por otro usuario`);
+    }
+  }
+  scheduleCurrentRender();
+}
+
+function displayName(table, record){
+  if(!record) return 'Un registro';
+  if(table === 'clientes' || table === 'crm') return record.nombre || 'Un registro';
+  if(table === 'locales') return record.nombre || 'Un local';
+  if(table === 'servicios') return record.nombre || 'Un servicio';
+  if(table === 'proyectos') return record.nombre || 'Un proyecto';
+  if(table === 'tareas') return record.titulo || 'Una tarea';
+  if(table === 'pagos') return record.servicio || 'Un pago';
+  if(table === 'eventos') return record.detalle || 'Un evento';
+  if(table === 'contenido') return record.titulo || 'Un contenido';
+  if(table === 'comercial') return record.nombre || 'Info comercial';
+  if(table === 'archivos') return record.nombre || 'Un archivo';
+  return 'Un registro';
+}
+
+function showRealtimeToast(msg){ toast(msg, 'realtime'); }
+
+function scheduleCurrentRender(){
+  if(REALTIME_RENDER_TIMER) clearTimeout(REALTIME_RENDER_TIMER);
+  REALTIME_RENDER_TIMER = setTimeout(() => {
+    REALTIME_RENDER_TIMER = null;
+    if (isInputFocused()) return;
+    const currentSection = document.querySelector('.tab-view:not(.hidden)')?.id?.replace('view-','');
+    if(currentSection){ try { renderSeccion(currentSection); } catch(e){ console.warn('Error re-render realtime:', e); } }
+    try { renderNotificaciones(); } catch(e){}
+  }, 250);
+}
+
+const ROLES = ['dueño','administrador','gerente','editor','diseñador','desarrollador','colaborador'];
+const ROLE_LABEL = {'dueño':'Dueño','administrador':'Admin','gerente':'Gerente','editor':'Editor','diseñador':'Diseñador','desarrollador':'Desarrollador','colaborador':'Colaborador'};
+const MODULOS = ['dashboard','clientes','empresas','servicios','pagos','proyectos','tareas','contenido','comercial','calendario','crm','archivos','usuarios','automatizaciones'];
+
+const PERM_MATRIX = {
+  'dueño':         { view:['dashboard','clientes','empresas','servicios','pagos','proyectos','tareas','contenido','comercial','calendario','crm','archivos','usuarios','automatizaciones','notificaciones','cuenta'], edit:'*' },
+  'administrador': { view:['dashboard','clientes','empresas','servicios','pagos','proyectos','tareas','contenido','comercial','calendario','crm','archivos','usuarios','automatizaciones','notificaciones','cuenta'], edit:'*' },
+  'gerente':       { view:['dashboard','clientes','empresas','servicios','pagos','proyectos','tareas','contenido','comercial','calendario','crm','archivos','notificaciones','cuenta'],
+                     edit:['clientes','empresas','servicios','pagos','proyectos','tareas','contenido','comercial','calendario','crm','archivos'] },
+  'editor':        { view:['dashboard','clientes','empresas','servicios','proyectos','tareas','contenido','calendario','crm','archivos','notificaciones','cuenta'],
+                     edit:['contenido','tareas','calendario'] },
+  'diseñador':     { view:['dashboard','clientes','empresas','servicios','contenido','calendario','archivos','notificaciones','cuenta'], edit:['contenido'] },
+  'desarrollador': { view:['dashboard','clientes','empresas','servicios','proyectos','tareas','calendario','archivos','notificaciones','cuenta'], edit:['proyectos','tareas'] },
+  'colaborador':   { view:['dashboard','clientes','tareas','calendario','archivos','notificaciones','cuenta'], edit:['tareas'] }
+};
+
+let CURRENT_USER = null;
+
+function can(modulo, action='view'){
+  if(!CURRENT_USER) return false;
+  const p = PERM_MATRIX[CURRENT_USER.rol];
+  if(!p) return false;
+  if(action === 'view')  return p.view.includes(modulo);
+  if(action === 'edit'){
+    if(p.edit === '*') return true;
+    return Array.isArray(p.edit) && p.edit.includes(modulo);
+  }
+  return false;
+}
+
+async function doLogin(e){
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const remember = document.getElementById('login-remember').checked;
+  try { localStorage.setItem(REMEMBER_KEY, remember ? 'true' : 'false'); } catch(e){}
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) { document.getElementById('login-error').classList.remove('hidden'); return; }
+  document.getElementById('login-error').classList.add('hidden');
+  const user = data.user;
+  const { data: perfil } = await sb.from('perfiles').select('*').eq('id', user.id).single();
+  const loggedUser = {
+    id: user.id, email: user.email,
+    nombre: perfil?.nombre_completo || user.email.split('@')[0],
+    rol: perfil?.rol || 'colaborador'
+  };
+  await enterApp(loggedUser);
+}
+
+async function doLogout(){
+  stopRealtime();
+  stopPresence();
+  await sb.auth.signOut();
+  try {
+    Object.keys(localStorage).forEach(k => { if(k.startsWith('sb-')) localStorage.removeItem(k); });
+    Object.keys(sessionStorage).forEach(k => { if(k.startsWith('sb-')) sessionStorage.removeItem(k); });
+  } catch(e){}
+  CURRENT_USER = null;
+  DB_CACHE = { clientes: [], locales: [], servicios: [], proyectos: [], tareas: [], crm: [], pagos: [], eventos: [], contenido: [], comercial: [], archivos: [], actividad: [] };
+  document.getElementById('app-view').classList.add('hidden');
+  document.getElementById('login-view').classList.remove('hidden');
+  document.getElementById('login-form').reset();
+  document.getElementById('global-search').value='';
+  document.getElementById('search-dropdown').classList.add('hidden');
+  document.getElementById('sidebar-panel').classList.add('-translate-x-full');
+  hardResetScroll();
+}
+
+async function enterApp(user){
+  CURRENT_USER = user;
+  document.getElementById('login-view').classList.add('hidden');
+  document.getElementById('app-view').classList.remove('hidden');
+  hardResetScroll();
+  setTimeout(hardResetScroll, 100);
+  await loadAllData();
+  renderSidebar();
+  document.getElementById('user-name-display').textContent = user.nombre;
+  document.getElementById('user-avatar').textContent = user.nombre.charAt(0).toUpperCase();
+  document.getElementById('user-role-display').textContent = ROLE_LABEL[user.rol] || user.rol;
+  document.getElementById('header-user-name').textContent = user.nombre;
+  document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.querySelectorAll('.tab-view').forEach(v=>v.classList.add('hidden'));
+  const orden = ['dashboard','clientes','empresas','servicios','pagos','proyectos','tareas','contenido','comercial','calendario','crm','archivos'];
+  let inicial = 'dashboard';
+  if(!can('dashboard','view')) inicial = orden.find(m=>can(m,'view')) || 'cuenta';
+  const v = document.getElementById('view-'+inicial);
+  if(v) v.classList.remove('hidden');
+  activarNav(inicial);
+  renderAll();
+  initRealtime();
+  startRealtimeHeartbeat();
+  initPresence();
+  if(!sessionStorage.getItem('bf_autos_ran')){
+    sessionStorage.setItem('bf_autos_ran','1');
+    setTimeout(() => { ejecutarAutomatizaciones(false); }, 2000);
+  }
+}
+
+async function checkSession(){
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    const { data: perfil } = await sb.from('perfiles').select('*').eq('id', session.user.id).single();
+    const user = {
+      id: session.user.id, email: session.user.email,
+      nombre: perfil?.nombre_completo || session.user.email.split('@')[0],
+      rol: perfil?.rol || 'colaborador'
+    };
+    await enterApp(user);
+  }
+}
+
+if (window.visualViewport) {
+  let _vpTimer = null;
+  window.visualViewport.addEventListener('resize', () => {
+    if (isInputFocused()) return;
+    if (!CURRENT_USER) return;
+    if (_vpTimer) clearTimeout(_vpTimer);
+    _vpTimer = setTimeout(() => {
+      if (!isInputFocused()) hardResetScroll();
+    }, 250);
+  });
+}
+window.addEventListener('orientationchange', () => {
+  if (isInputFocused()) return;
+  if (CURRENT_USER) setTimeout(hardResetScroll, 300);
+});
+
+/* Enter navega al siguiente campo en el modal (no envía) */
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  const t = e.target;
+  if (!t || t.tagName !== 'INPUT') return;
+  const type = (t.type || 'text').toLowerCase();
+  if (['submit','button','checkbox','radio','file','hidden','range','color'].includes(type)) return;
+  const modalForm = t.closest('#modal-form');
+  if (!modalForm) return;
+  e.preventDefault();
+  e.stopPropagation();
+  const fields = Array.from(modalForm.querySelectorAll('input, select, textarea'))
+    .filter(el => {
+      if (el.disabled) return false;
+      if (el.type === 'hidden') return false;
+      if (['submit','button','checkbox','radio','file','range','color'].includes(el.type)) return false;
+      return true;
+    });
+  const idx = fields.indexOf(t);
+  if (idx !== -1 && idx < fields.length - 1) {
+    fields[idx + 1].focus();
+  }
+}, true);
+
+const NAV_ITEMS = [
+  {sec:'dashboard', icon:'M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z', label:'Dashboard'},
+  {sec:'clientes', icon:'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', label:'Clientes'},
+  {sec:'empresas', icon:'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', label:'Empresas y Locales'},
+  {sec:'servicios', icon:'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4', label:'Catálogo Servicios'},
+  {sec:'pagos', icon:'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', label:'Pagos y Contratos'},
+  {sec:'proyectos', icon:'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4', label:'Proyectos'},
+  {sec:'tareas', icon:'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', label:'Tareas'},
+  {sec:'contenido', icon:'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z', label:'Contenido'},
+  {sec:'comercial', icon:'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', label:'Info Comercial'},
+  {sec:'calendario', icon:'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', label:'Calendario'},
+  {sec:'crm', icon:'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6', label:'CRM'},
+  {sec:'archivos', icon:'M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z', label:'Archivos'},
+  {sec:'notificaciones', icon:'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9', label:'Notificaciones'},
+  {sec:'usuarios', icon:'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z', label:'Usuarios', admin:true},
+  {sec:'automatizaciones', icon:'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4', label:'Automatizaciones', admin:true},
+  {sec:'cuenta', icon:'M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z', label:'Mi cuenta', always:true}
+];
+
+function renderSidebar(){
+  const nav = document.getElementById('sidebar-nav');
+  nav.innerHTML = NAV_ITEMS.map(item=>{
+    const isAdmin = item.admin;
+    const allow = item.always ? true : isAdmin ? (CURRENT_USER.rol==='dueño' || CURRENT_USER.rol==='administrador') : can(item.sec,'view');
+    if(!allow) return '';
+    return `<button onclick="switchTab('${item.sec}')" data-nav="${item.sec}" class="w-full flex items-center space-x-3.5 px-3.5 py-3 rounded-2xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition nav-btn">
+      <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="${item.icon}"/></svg>
+      <span>${item.label}</span>
+    </button>`;
+  }).join('');
+}
+
+function activarNav(sec){
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    if(b.dataset.nav===sec){ b.classList.add('bg-indigo-500/15','text-white','font-semibold','ring-1','ring-indigo-500/30'); }
+    else { b.classList.remove('bg-indigo-500/15','text-white','font-semibold','ring-1','ring-indigo-500/30'); }
+  });
+}
+
+function switchTab(sec){
+  if(MODULOS.includes(sec) && !can(sec,'view')){ toast('Sin permisos','error'); return; }
+  if(sec==='usuarios' && CURRENT_USER.rol!=='dueño' && CURRENT_USER.rol!=='administrador') return;
+  if(sec==='automatizaciones' && CURRENT_USER.rol!=='dueño' && CURRENT_USER.rol!=='administrador') return;
+  document.querySelectorAll('.tab-view').forEach(v=>v.classList.add('hidden'));
+  const v = document.getElementById('view-'+sec);
+  if(v) v.classList.remove('hidden');
+  activarNav(sec);
+  if(window.innerWidth<768) toggleMobileSidebar();
+  renderSeccion(sec);
+}
+
+function renderSeccion(sec){
+  const renderers = {
+    dashboard:renderDashboard, clientes:renderClientes, empresas:renderEmpresas, servicios:renderServicios,
+    pagos:renderPagos, proyectos:renderProyectos, tareas:renderKanban, contenido:renderContenido,
+    comercial:renderComercial, calendario:renderCalendario, crm:renderCRM, archivos:renderArchivos,
+    notificaciones:renderNotificaciones, automatizaciones:renderAutomatizaciones, usuarios:renderUsuarios,
+    cuenta: renderMiCuenta
+  };
+  if(renderers[sec]) renderers[sec]();
+}
+
+function toggleMobileSidebar(){ document.getElementById('sidebar-panel').classList.toggle('-translate-x-full'); }
+
+function toggleTheme(){
+  const h = document.documentElement;
+  const appBtn = document.getElementById('theme-toggle-btn');
+  const loginBtn = document.getElementById('login-theme-btn');
+  if(h.classList.contains('dark')){
+    h.classList.remove('dark');
+    if(appBtn) appBtn.innerText='☀️';
+    if(loginBtn) loginBtn.innerText='☀️';
+    localStorage.setItem('bf_theme','light');
+  } else {
+    h.classList.add('dark');
+    if(appBtn) appBtn.innerText='🌙';
+    if(loginBtn) loginBtn.innerText='🌙';
+    localStorage.setItem('bf_theme','dark');
+  }
+}
+(function initTheme(){
+  try{
+    const saved = localStorage.getItem('bf_theme');
+    const h = document.documentElement;
+    const appBtn = document.getElementById('theme-toggle-btn');
+    const loginBtn = document.getElementById('login-theme-btn');
+    if(saved === 'light'){ h.classList.remove('dark'); if(appBtn) appBtn.innerText = '☀️'; if(loginBtn) loginBtn.innerText = '☀️'; }
+    else { h.classList.add('dark'); if(appBtn) appBtn.innerText = '🌙'; if(loginBtn) loginBtn.innerText = '🌙'; }
+  }catch(e){}
+})();
+
+let MODAL_CTX = { type:null, id:null, onSubmit:null };
+
+function fieldHTML(f, val){
+  const v = val ?? f.value ?? '';
+  const cls = 'w-full px-4 py-3 bg-slate-950 border border-slate-800 rounded-2xl text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition';
+  const lbl = 'block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2';
+  if(f.type==='textarea') return `<div><label class="${lbl}">${esc(f.label||'')}${f.required?' *':''}</label><textarea name="${f.name}" rows="${f.rows||3}" placeholder="${esc(f.placeholder||'')}" class="${cls}">${esc(v)}</textarea></div>`;
+  if(f.type==='select'){
+    return `<div><label class="${lbl}">${esc(f.label||'')}${f.required?' *':''}</label><select name="${f.name}" ${f.required?'required':''} class="${cls}">${(f.options||[]).map(o=>{
+      const val2 = typeof o==='object'?o.value:o;
+      const lab = typeof o==='object'?o.label:o;
+      return `<option value="${esc(val2)}" ${String(val2)===String(v)?'selected':''}>${esc(lab)}</option>`;
+    }).join('')}</select></div>`;
+  }
+  if(f.type==='multiselect'){
+    const arr = Array.isArray(v)?v:[];
+    return `<div><label class="${lbl}">${esc(f.label||'')}</label><select name="${f.name}" multiple size="${f.size||5}" class="${cls}" style="min-height:110px;">${(f.options||[]).map(o=>{
+      const val2 = typeof o==='object'?o.value:o;
+      const lab = typeof o==='object'?o.label:o;
+      return `<option value="${esc(val2)}" ${arr.includes(val2)?'selected':''}>${esc(lab)}</option>`;
+    }).join('')}</select></div>`;
+  }
+  if(f.type==='file'){
+    return `<div><label class="${lbl}">${esc(f.label||'')}</label><input type="file" name="${f.name}" ${f.multiple?'multiple':''} accept="${f.accept||''}" class="w-full text-sm text-slate-300 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-indigo-600 file:text-white file:font-semibold hover:file:bg-indigo-500"></div>`;
+  }
+  const minAttr = (f.min!==undefined&&f.min!==null) ? `min="${esc(f.min)}"` : '';
+  const maxAttr = (f.max!==undefined&&f.max!==null) ? `max="${esc(f.max)}"` : '';
+  return `<div><label class="${lbl}">${esc(f.label||'')}${f.required?' *':''}</label><input type="${f.type||'text'}" name="${f.name}" value="${esc(v)}" placeholder="${esc(f.placeholder||'')}" ${f.required?'required':''} ${minAttr} ${maxAttr} class="${cls}"></div>`;
+}
+
+function openForm({title, fields, initial={}, onSubmit, submitLabel='Guardar'}){
+  document.getElementById('modal-title').textContent = title;
+  const fieldsEl = document.getElementById('modal-fields');
+  fieldsEl.innerHTML = fields.map(f=>fieldHTML(f, initial[f.name])).join('');
+  document.getElementById('modal-root').classList.remove('hidden');
+  document.getElementById('modal-root').classList.add('flex');
+  MODAL_CTX.onSubmit = onSubmit;
+  setTimeout(()=>{const el = fieldsEl.querySelector('input,select,textarea'); el && el.focus();},50);
+}
+
+function closeModal(){
+  document.getElementById('modal-root').classList.add('hidden');
+  document.getElementById('modal-root').classList.remove('flex');
+  document.getElementById('modal-fields').innerHTML = '';
+  MODAL_CTX = {type:null,id:null,onSubmit:null};
+}
+
+/* ✅ FIX GUARDADO: convierte strings vacíos en null para no fallar en UUID/DATE/NUMBER de Supabase */
+async function handleFormSubmit(e){
+  e.preventDefault();
+  const form = e.target;
+  const fields = form.querySelectorAll('input,select,textarea');
+  const data = {};
+  fields.forEach(el=>{
+    if(el.type==='file') return;
+    let v;
+    if(el.tagName==='SELECT' && el.multiple) v = Array.from(el.selectedOptions).map(o=>o.value);
+    else if(el.type==='number'){
+      v = el.value==='' ? null : Number(el.value);
+      if(v!==null && el.max!=='' && !isNaN(Number(el.max))) v = Math.min(v, Number(el.max));
+      if(v!==null && el.min!=='' && !isNaN(Number(el.min))) v = Math.max(v, Number(el.min));
+    }
+    else v = el.value?.trim ? el.value.trim() : el.value;
+    // ✅ Convertir strings vacíos a null (evita error al insertar en columnas UUID/date)
+    if(v === '') v = null;
+    data[el.name] = v;
+  });
+  if(MODAL_CTX.onSubmit){
+    const ok = await MODAL_CTX.onSubmit(data);
+    if(ok !== false) closeModal();
+  }
+}
+document.getElementById('modal-root').addEventListener('click',e=>{ if(e.target.id==='modal-root') closeModal(); });
+
+function openQuickCreate(){
+  const items = [
+    {sec:'clientes',icon:'👤',txt:'Cliente',fn:'formCliente()'},
+    {sec:'empresas',icon:'🏢',txt:'Local',fn:'formLocal()'},
+    {sec:'servicios',icon:'🧩',txt:'Servicio',fn:'formServicio()'},
+    {sec:'proyectos',icon:'📁',txt:'Proyecto',fn:'formProyecto()'},
+    {sec:'tareas',icon:'✅',txt:'Tarea',fn:'formTarea()'},
+    {sec:'contenido',icon:'🎨',txt:'Contenido',fn:'formContenido()'},
+    {sec:'calendario',icon:'📅',txt:'Evento',fn:'formEvento()'},
+    {sec:'pagos',icon:'💳',txt:'Pago',fn:'formPago()'}
+  ].filter(i=>can(i.sec,'edit'));
+  if(!items.length){ toast('Sin permisos','error'); return; }
+  document.getElementById('modal-title').textContent = '¿Qué quieres crear?';
+  document.getElementById('modal-fields').innerHTML = `<div class="grid grid-cols-2 gap-4">${items.map(i=>`
+    <button type="button" onclick="closeModal();${i.fn}" class="p-5 border border-slate-800 bg-slate-950 rounded-2xl text-left hover:border-indigo-500/50 hover:bg-slate-900 transition">
+      <div class="text-2xl mb-2">${i.icon}</div><div class="font-semibold text-white text-sm">${i.txt}</div>
+    </button>`).join('')}</div>`;
+  document.getElementById('modal-root').classList.remove('hidden');
+  document.getElementById('modal-root').classList.add('flex');
+  MODAL_CTX.onSubmit = null;
+}
+
+const clientesOpts = () => [{value:'',label:'—'},...Store.all('clientes').map(c=>({value:c.id,label:c.nombre}))];
+const localesOpts = () => [{value:'',label:'—'},...Store.all('locales').map(l=>({value:l.id,label:l.nombre}))];
+const serviciosOpts = () => Store.all('servicios').map(s=>({value:s.id,label:s.nombre}));
+const proyectosOpts = () => [{value:'',label:'—'},...Store.all('proyectos').map(p=>({value:p.id,label:p.nombre}))];
+
+const ESTADOS_CLIENTE = ['Prospecto','Contactado','En negociación','Cliente activo','Cliente pausado','Cliente finalizado'];
+async function formCliente(existing){
+  const isEdit = !!existing;
+  openForm({
+    title: isEdit?'Editar cliente':'Nuevo cliente',
+    initial: existing||{estado:'Prospecto'},
+    fields:[
+      {name:'nombre',label:'Nombre / Empresa',required:true},
+      {name:'contacto',label:'Persona de contacto'},
+      {name:'nit',label:'NIT / Documento'},
+      {name:'telefono',label:'Teléfono'},
+      {name:'whatsapp',label:'WhatsApp'},
+      {name:'email',label:'Correo',type:'email'},
+      {name:'ciudad',label:'Ciudad'},
+      {name:'direccion',label:'Dirección'},
+      {name:'redes_sociales',label:'Redes sociales'},
+      {name:'estado',label:'Estado',type:'select',options:ESTADOS_CLIENTE,required:true},
+      {name:'notas',label:'Notas',type:'textarea'}
+    ],
+    submitLabel: isEdit?'Guardar':'Crear',
+    async onSubmit(d){
+      if(isEdit){ await Store.update('clientes',existing.id,d,CURRENT_USER.nombre); logActivity(`Actualizó cliente "${d.nombre}"`); toast('Actualizado'); }
+      else { await Store.add('clientes',{...d,registrado:todayStr()},CURRENT_USER.nombre); logActivity(`Creó cliente "${d.nombre}"`); toast('Creado'); }
+      renderAll();
+    }
+  });
+}
+
+async function eliminarCliente(id){
+  const c = clienteById(id); if(!c) return;
+  const relaciones = [
+    { tabla: 'locales',   label: 'local(es)' },
+    { tabla: 'proyectos', label: 'proyecto(s)' },
+    { tabla: 'tareas',    label: 'tarea(s)' },
+    { tabla: 'pagos',     label: 'pago(s)' },
+    { tabla: 'crm',       label: 'prospecto(s) CRM' },
+    { tabla: 'contenido', label: 'contenido(s)' },
+    { tabla: 'comercial', label: 'info comercial' },
+    { tabla: 'eventos',   label: 'evento(s)' }
+  ];
+  const conteos = {};
+  relaciones.forEach(r => {
+    conteos[r.tabla] = Store.all(r.tabla).filter(x => String(x.cliente_id) === String(id)).length;
+  });
+  const resumen = relaciones
+    .filter(r => conteos[r.tabla] > 0)
+    .map(r => `${conteos[r.tabla]} ${r.label}`)
+    .join(', ');
+  const msg = `¿Eliminar "${c.nombre}"?` +
+    (resumen ? `\n\nTambién se eliminarán:\n• ${resumen.replace(/, /g, '\n• ')}` : '') +
+    `\n\nEsta acción no se puede deshacer.`;
+  if(!confirmar(msg)) return;
+  for (const r of relaciones) {
+    const items = Store.all(r.tabla).filter(x => String(x.cliente_id) === String(id));
+    for (const item of items) {
+      await Store.remove(r.tabla, item.id);
+    }
+  }
+  await Store.remove('clientes', id);
+  logActivity(`Eliminó cliente "${c.nombre}" y sus datos asociados`);
+  renderAll();
+}
+function editarCliente(id){ const c = clienteById(id); if(c) formCliente(c); }
+
+async function formLocal(existing){
+  const clientes = Store.all('clientes');
+  if(!clientes.length){ toast('Crea primero un cliente','error'); return; }
+  const isEdit = !!existing;
+  openForm({
+    title: isEdit?'Editar local':'Nuevo local',
+    initial: existing||{cliente_id:clientes[0].id},
+    fields:[
+      {name:'cliente_id',label:'Cliente',type:'select',required:true,options:clientes.map(c=>({value:c.id,label:c.nombre}))},
+      {name:'nombre',label:'Nombre',required:true},
+      {name:'direccion',label:'Dirección'},
+      {name:'ciudad',label:'Ciudad'},
+      {name:'telefono',label:'Teléfono'},
+      {name:'horario',label:'Horario'},
+      {name:'responsable',label:'Responsable'},
+      {name:'redes_sociales',label:'Redes sociales'},
+      {name:'notas',label:'Notas',type:'textarea'}
+    ],
+    async onSubmit(d){
+      if(isEdit){ await Store.update('locales',existing.id,d,CURRENT_USER.nombre); logActivity(`Actualizó local "${d.nombre}"`); }
+      else { await Store.add('locales',d,CURRENT_USER.nombre); logActivity(`Registró local "${d.nombre}"`); }
+      toast('Guardado'); renderAll();
+    }
+  });
+}
+async function eliminarLocal(id){
+  const l = localById(id); if(!l) return;
+  if(!confirmar(`¿Eliminar "${l.nombre}"?`)) return;
+  await Store.remove('locales',id); logActivity(`Eliminó local "${l.nombre}"`); renderAll();
+}
+function editarLocal(id){ const l = localById(id); if(l) formLocal(l); }
+
+const CATEGORIAS_SERV = ['Desarrollo','Marketing','Datos','Automatización','Soporte','Diseño','Consultoría'];
+const COBROS_SERV = ['Único','Mensual','Por evento','Por hora','Trimestral','Anual'];
+const ESTADOS_SERV = ['Activo','En preparación','Pausado','Retirado'];
+async function formServicio(existing){
+  const isEdit = !!existing;
+  openForm({
+    title: isEdit?'Editar servicio':'Nuevo servicio',
+    initial: existing||{categoria:'Desarrollo',tipo_cobro:'Único',estado:'Activo'},
+    fields:[
+      {name:'nombre',label:'Nombre',required:true},
+      {name:'categoria',label:'Categoría',type:'select',options:CATEGORIAS_SERV,required:true},
+      {name:'precio_base',label:'Precio base',type:'number'},
+      {name:'tipo_cobro',label:'Cobro',type:'select',options:COBROS_SERV,required:true},
+      {name:'estado',label:'Estado',type:'select',options:ESTADOS_SERV,required:true},
+      {name:'tiempo_estimado',label:'Tiempo estimado'},
+      {name:'responsable',label:'Responsable'},
+      {name:'descripcion',label:'Descripción',type:'textarea'}
+    ],
+    async onSubmit(d){
+      if(isEdit){ await Store.update('servicios',existing.id,d,CURRENT_USER.nombre); logActivity(`Actualizó servicio "${d.nombre}"`); }
+      else { await Store.add('servicios',d,CURRENT_USER.nombre); logActivity(`Creó servicio "${d.nombre}"`); }
+      toast('Guardado'); renderAll();
+    }
+  });
+}
+async function eliminarServicio(id){
+  const s = servicioById(id); if(!s) return;
+  if(!confirmar(`¿Eliminar "${s.nombre}"?`)) return;
+  await Store.remove('servicios',id); logActivity(`Eliminó servicio "${s.nombre}"`); renderAll();
+}
+function editarServicio(id){ const s = servicioById(id); if(s) formServicio(s); }
+
+const ESTADOS_PROY = ['Planificación','Diseño','Desarrollo','Revisión','Correcciones','Aprobación','Publicado','Finalizado'];
+async function formProyecto(existing){
+  const clientes = Store.all('clientes');
+  if(!clientes.length){ toast('Crea primero un cliente','error'); return; }
+  const isEdit = !!existing;
+  openForm({
+    title: isEdit?'Editar proyecto':'Nuevo proyecto',
+    initial: existing||{estado:'Planificación',progreso:0,fecha_inicio:todayStr(),prioridad:'Media'},
+    fields:[
+      {name:'nombre',label:'Nombre',required:true},
+      {name:'cliente_id',label:'Cliente',type:'select',required:true,options:clientes.map(c=>({value:c.id,label:c.nombre}))},
+      {name:'local_id',label:'Local',type:'select',options:localesOpts()},
+      {name:'servicio_id',label:'Servicio',type:'select',options:[{value:'',label:'—'},...serviciosOpts()]},
+      {name:'responsable',label:'Responsable'},
+      {name:'estado',label:'Estado',type:'select',options:ESTADOS_PROY,required:true},
+      {name:'progreso',label:'Progreso (%)',type:'number',min:0,max:100},
+      {name:'prioridad',label:'Prioridad',type:'select',options:['Alta','Media','Baja']},
+      {name:'fecha_inicio',label:'Inicio',type:'date'},
+      {name:'fecha_limite',label:'Fecha límite',type:'date'},
+      {name:'descripcion',label:'Descripción',type:'textarea'}
+    ],
+    async onSubmit(d){
+      if(isEdit){ await Store.update('proyectos',existing.id,d,CURRENT_USER.nombre); logActivity(`Actualizó proyecto "${d.nombre}"`); }
+      else { await Store.add('proyectos',d,CURRENT_USER.nombre); logActivity(`Creó proyecto "${d.nombre}"`); }
+      toast('Guardado'); renderAll();
+    }
+  });
+}
+async function eliminarProyecto(id){
+  const p = Store.find('proyectos',id); if(!p) return;
+  if(!confirmar(`¿Eliminar "${p.nombre}"?`)) return;
+  await Store.remove('proyectos',id); logActivity(`Eliminó proyecto "${p.nombre}"`); renderAll();
+}
+function editarProyecto(id){ const p = Store.find('proyectos',id); if(p) formProyecto(p); }
+
+const COLUMNAS_TAREAS = ['Pendiente','En preparación','En progreso','Revisión','Hecho'];
+const PRIO_EMOJI = {alta:'🔴',media:'🟡',baja:'🟢'};
+async function formTarea(existing){
+  const isEdit = !!existing;
+  openForm({
+    title: isEdit?'Editar tarea':'Nueva tarea',
+    initial: existing||{estado:'Pendiente',prioridad:'media',fecha_limite:todayStr()},
+    fields:[
+      {name:'titulo',label:'Título',required:true},
+      {name:'cliente_id',label:'Cliente',type:'select',options:clientesOpts()},
+      {name:'local_id',label:'Local',type:'select',options:localesOpts()},
+      {name:'proyecto_id',label:'Proyecto',type:'select',options:proyectosOpts()},
+      {name:'responsable',label:'Responsable'},
+      {name:'prioridad',label:'Prioridad',type:'select',options:[{value:'alta',label:'🔴 Alta'},{value:'media',label:'🟡 Media'},{value:'baja',label:'🟢 Baja'}]},
+      {name:'fecha_limite',label:'Vence',type:'date'},
+      {name:'estado',label:'Estado',type:'select',options:COLUMNAS_TAREAS,required:true},
+      {name:'descripcion',label:'Descripción',type:'textarea'}
+    ],
+    async onSubmit(d){
+      if(isEdit){ await Store.update('tareas',existing.id,d,CURRENT_USER.nombre); logActivity(`Actualizó tarea "${d.titulo}"`); }
+      else { await Store.add('tareas',d,CURRENT_USER.nombre); logActivity(`Creó tarea "${d.titulo}"`); }
+      toast('Guardado'); renderAll();
+    }
+  });
+}
+async function eliminarTarea(id){
+  const t = Store.find('tareas',id); if(!t) return;
+  if(!confirmar(`¿Eliminar "${t.titulo}"?`)) return;
+  await Store.remove('tareas',id); logActivity(`Eliminó tarea "${t.titulo}"`); renderAll();
+}
+function editarTarea(id){ const t = Store.find('tareas',id); if(t) formTarea(t); }
+
+const TIPOS_EVENTO = ['Evento','Publicación','Vencimiento','Fecha límite','Reunión'];
+async function formEvento(existing){
+  const isEdit = !!existing;
+  openForm({
+    title: isEdit?'Editar evento':'Nuevo evento',
+    initial: existing||{fecha:todayStr(),hora:'—',tipo:'Evento'},
+    fields:[
+      {name:'detalle',label:'Detalle',required:true},
+      {name:'cliente_id',label:'Cliente',type:'select',options:clientesOpts()},
+      {name:'local_id',label:'Local',type:'select',options:localesOpts()},
+      {name:'fecha',label:'Fecha',type:'date',required:true},
+      {name:'hora',label:'Hora'},
+      {name:'tipo',label:'Tipo',type:'select',options:TIPOS_EVENTO,required:true}
+    ],
+    async onSubmit(d){
+      if(isEdit){ await Store.update('eventos',existing.id,d,CURRENT_USER.nombre); logActivity(`Actualizó evento "${d.detalle}"`); }
+      else { await Store.add('eventos',d,CURRENT_USER.nombre); logActivity(`Creó evento "${d.detalle}"`); }
+      toast('Guardado'); renderAll();
+    }
+  });
+}
+async function eliminarEvento(id){
+  const e = Store.find('eventos',id); if(!e) return;
+  if(!confirmar(`¿Eliminar "${e.detalle}"?`)) return;
+  await Store.remove('eventos',id); renderAll();
+}
+function editarEvento(id){ const e = Store.find('eventos',id); if(e) formEvento(e); }
+
+const ESTADOS_PAGO = ['Al día','Pendiente','Vencido'];
+async function formPago(existing){
+  const clientes = Store.all('clientes');
+  if(!clientes.length){ toast('Crea primero un cliente','error'); return; }
+  const isEdit = !!existing;
+  openForm({
+    title: isEdit?'Editar pago':'Nuevo pago',
+    initial: existing||{estado:'Pendiente',forma_pago:'Mensual',fecha_inicio:todayStr()},
+    fields:[
+      {name:'cliente_id',label:'Cliente',type:'select',required:true,options:clientes.map(c=>({value:c.id,label:c.nombre}))},
+      {name:'local_id',label:'Local',type:'select',options:localesOpts()},
+      {name:'servicio',label:'Servicio',type:'select',required:true,options:Store.all('servicios').length?Store.all('servicios').map(s=>({value:s.nombre,label:s.nombre})):[{value:'—',label:'Sin servicios'}]},
+      {name:'precio',label:'Precio',type:'number',required:true},
+      {name:'forma_pago',label:'Forma de pago'},
+      {name:'fecha_inicio',label:'Inicio',type:'date'},
+      {name:'fecha_vencimiento',label:'Vence',type:'date'},
+      {name:'estado',label:'Estado',type:'select',options:ESTADOS_PAGO,required:true}
+    ],
+    async onSubmit(d){
+      if(isEdit){ await Store.update('pagos',existing.id,d,CURRENT_USER.nombre); logActivity(`Actualizó pago de "${clienteName(d.cliente_id)}"`); }
+      else { await Store.add('pagos',d,CURRENT_USER.nombre); logActivity(`Registró pago de "${clienteName(d.cliente_id)}"`); }
+      toast('Guardado'); renderAll();
+    }
+  });
+}
+async function eliminarPago(id){
+  if(!confirmar('¿Eliminar este pago?')) return;
+  await Store.remove('pagos',id); renderAll();
+}
+function editarPago(id){ const p = Store.find('pagos',id); if(p) formPago(p); }
+
+const ETAPAS_CRM = ['Contacto','Interesado','Negociación','Propuesta','Cliente'];
+async function formCRM(existing){
+  const isEdit = !!existing;
+  openForm({
+    title: isEdit?'Editar prospecto':'Nuevo prospecto',
+    initial: existing||{etapa:'Contacto'},
+    fields:[
+      {name:'nombre',label:'Nombre',required:true},
+      {name:'empresa',label:'Empresa'},
+      {name:'telefono',label:'Teléfono'},
+      {name:'whatsapp',label:'WhatsApp'},
+      {name:'servicio_interes',label:'Servicio de interés'},
+      {name:'presupuesto_estimado',label:'Presupuesto estimado'},
+      {name:'etapa',label:'Etapa',type:'select',options:ETAPAS_CRM,required:true},
+      {name:'ultimo_contacto',label:'Último contacto',type:'date'},
+      {name:'proximo_contacto',label:'Próximo contacto',type:'date'},
+      {name:'notas',label:'Notas',type:'textarea'}
+    ],
+    async onSubmit(d){
+      if(isEdit){ await Store.update('crm',existing.id,d,CURRENT_USER.nombre); logActivity(`Actualizó prospecto "${d.nombre}"`); }
+      else { await Store.add('crm',d,CURRENT_USER.nombre); logActivity(`Registró prospecto "${d.nombre}"`); }
+      toast('Guardado'); renderAll();
+    }
+  });
+}
+async function eliminarCRM(id){
+  if(!confirmar('¿Eliminar este prospecto?')) return;
+  await Store.remove('crm',id); renderAll();
+}
+function editarCRM(id){ const i = Store.find('crm',id); if(i) formCRM(i); }
+
+const ESTADOS_CONT = ['Idea','En diseño','En revisión','Aprobado','Programado','Publicado'];
+const PLATAFORMAS = ['Instagram','Facebook','TikTok','LinkedIn','YouTube','WhatsApp','Google Business','Otra'];
+const TIPOS_CONT = ['Publicación','Historia','Video','Imagen','Promoción','Campaña','Evento','Anuncio'];
+async function formContenido(existing){
+  const clientes = Store.all('clientes');
+  if(!clientes.length){ toast('Crea primero un cliente','error'); return; }
+  const isEdit = !!existing;
+  openForm({
+    title: isEdit?'Editar contenido':'Nuevo contenido',
+    initial: existing||{estado:'Idea',plataforma:'Instagram',tipo:'Publicación',fecha_publicacion:todayStr(),cliente_id:clientes[0].id},
+    fields:[
+      {name:'titulo',label:'Título',required:true},
+      {name:'cliente_id',label:'Cliente',type:'select',options:clientes.map(c=>({value:c.id,label:c.nombre}))},
+      {name:'local_id',label:'Local',type:'select',options:localesOpts()},
+      {name:'plataforma',label:'Plataforma',type:'select',options:PLATAFORMAS},
+      {name:'tipo',label:'Tipo',type:'select',options:TIPOS_CONT},
+      {name:'fecha_publicacion',label:'Fecha de publicación',type:'date'},
+      {name:'responsable',label:'Responsable'},
+      {name:'estado',label:'Estado',type:'select',options:ESTADOS_CONT,required:true},
+      {name:'descripcion',label:'Descripción',type:'textarea'}
+    ],
+    async onSubmit(d){
+      if(isEdit){ await Store.update('contenido',existing.id,d,CURRENT_USER.nombre); logActivity(`Actualizó contenido "${d.titulo}"`); }
+      else { await Store.add('contenido',d,CURRENT_USER.nombre); logActivity(`Creó contenido "${d.titulo}"`); }
+      toast('Guardado'); renderAll();
+    }
+  });
+}
+async function eliminarContenido(id){
+  if(!confirmar('¿Eliminar este contenido?')) return;
+  await Store.remove('contenido',id); renderAll();
+}
+function editarContenido(id){ const c = Store.find('contenido',id); if(c) formContenido(c); }
+
+const CATS_COMERCIAL = ['Horario','Precio','Evento','Promoción'];
+async function formComercial(existing){
+  const locales = Store.all('locales');
+  if(!locales.length){ toast('Crea primero un local','error'); return; }
+  const isEdit = !!existing;
+  openForm({
+    title: isEdit?'Editar información':'Nueva información comercial',
+    initial: existing||{local_id:locales[0].id,categoria:'Horario'},
+    fields:[
+      {name:'local_id',label:'Local',type:'select',required:true,options:locales.map(l=>({value:l.id,label:l.nombre}))},
+      {name:'categoria',label:'Categoría',type:'select',options:CATS_COMERCIAL,required:true},
+      {name:'nombre',label:'Nombre',required:true},
+      {name:'valor',label:'Valor / Detalle'},
+      {name:'notas',label:'Notas',type:'textarea'}
+    ],
+    async onSubmit(d){
+      if(isEdit){ await Store.update('comercial',existing.id,d,CURRENT_USER.nombre); logActivity(`Actualizó info comercial "${d.nombre}"`); }
+      else { await Store.add('comercial',d,CURRENT_USER.nombre); logActivity(`Registró info comercial "${d.nombre}"`); }
+      toast('Guardado'); renderAll();
+    }
+  });
+}
+async function eliminarComercial(id){
+  if(!confirmar('¿Eliminar?')) return;
+  await Store.remove('comercial',id); renderAll();
+}
+function editarComercial(id){ const c = Store.find('comercial',id); if(c) formComercial(c); }
+
+const CARD = 'ui-card p-6 sm:p-7 rounded-3xl shadow-lg flex flex-col justify-between space-y-6';
+const BTN_PRIMARY = 'btn-glow bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 rounded-2xl text-sm font-semibold shadow-lg shadow-indigo-900/40 transition';
+const BTN_GHOST = 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-5 py-3 rounded-2xl text-sm font-semibold transition hover:border-slate-600';
+const BTN_SM = 'p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition text-xs';
+const INPUT = 'w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-2xl text-sm text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition';
+const HEADER_VIEW = 'ui-view-header flex flex-col sm:flex-row sm:items-center sm:justify-between border border-slate-800 p-6 sm:p-8 rounded-3xl shadow-lg gap-4 sm:gap-6';
+
+function actionButtons(col,id){
+  const seccion = (col||'').toLowerCase()
+    .replace('cliente','clientes').replace('local','empresas')
+    .replace('servicio','servicios').replace('pago','pagos')
+    .replace('proyecto','proyectos').replace('contenido','contenido');
+  if(!can(seccion,'edit')) return '';
+  return `<div class="flex items-center space-x-2 justify-end">
+    <button onclick="editar${col}('${id}')" class="${BTN_SM}">✏️</button>
+    <button onclick="eliminar${col}('${id}')" class="${BTN_SM} hover:bg-red-950/60 hover:text-red-400">🗑️</button>
+  </div>`;
+}
+
+function badge(txt){
+  const map = {
+    'Cliente activo':'bg-emerald-950 text-emerald-300 border-emerald-900',
+    'En negociación':'bg-amber-950 text-amber-300 border-amber-900',
+    'Prospecto':'bg-slate-800 text-slate-300 border-slate-700',
+    'Contactado':'bg-blue-950 text-blue-300 border-blue-900',
+    'Cliente pausado':'bg-amber-950 text-amber-300 border-amber-900',
+    'Cliente finalizado':'bg-slate-800 text-slate-400 border-slate-700',
+    'Activo':'bg-emerald-950 text-emerald-300 border-emerald-900',
+    'Al día':'bg-emerald-950 text-emerald-300 border-emerald-900',
+    'Vencido':'bg-red-950 text-red-300 border-red-900',
+    'Pendiente':'bg-amber-950 text-amber-300 border-amber-900',
+    'En preparación':'bg-amber-950 text-amber-300 border-amber-900',
+    'Desarrollo':'bg-blue-950 text-blue-300 border-blue-900',
+    'Revisión':'bg-amber-950 text-amber-300 border-amber-900',
+    'Planificación':'bg-slate-800 text-slate-300 border-slate-700',
+    'Diseño':'bg-blue-950 text-blue-300 border-blue-900',
+    'Publicado':'bg-emerald-950 text-emerald-300 border-emerald-900',
+    'Finalizado':'bg-slate-800 text-slate-400 border-slate-700',
+    'Evento':'bg-blue-950 text-blue-300 border-blue-900',
+    'Publicación':'bg-emerald-950 text-emerald-300 border-emerald-900',
+    'Vencimiento':'bg-red-950 text-red-300 border-red-900',
+    'Fecha límite':'bg-amber-950 text-amber-300 border-amber-900',
+    'Reunión':'bg-slate-800 text-slate-300 border-slate-700',
+    'Idea':'bg-slate-800 text-slate-300 border-slate-700',
+    'En diseño':'bg-blue-950 text-blue-300 border-blue-900',
+    'En revisión':'bg-amber-950 text-amber-300 border-amber-900',
+    'Aprobado':'bg-blue-950 text-blue-300 border-blue-900',
+    'Programado':'bg-emerald-950 text-emerald-300 border-emerald-900',
+    'Horario':'bg-blue-950 text-blue-300 border-blue-900',
+    'Precio':'bg-emerald-950 text-emerald-300 border-emerald-900',
+    'Promoción':'bg-amber-950 text-amber-300 border-amber-900'
+  };
+  const cls = map[txt] || 'bg-slate-800 text-slate-300 border-slate-700';
+  return `<span class="ui-badge px-3 py-1 rounded-full text-[11px] font-semibold border ${cls}">${esc(txt)}</span>`;
+}
+
+function emptyState(icon,title,sub,btnAction,btnLabel){
+  return `<div class="flex flex-col items-center justify-center py-20 sm:py-28 gap-6">
+    <div class="w-20 h-20 rounded-3xl bg-slate-900 border border-slate-800 flex items-center justify-center text-4xl">${icon}</div>
+    <div class="text-center space-y-2">
+      <h3 class="text-lg font-bold text-white">${esc(title)}</h3>
+      <p class="text-sm text-slate-400 max-w-sm">${esc(sub)}</p>
+    </div>
+    ${btnAction?`<button onclick="${btnAction}" class="${BTN_PRIMARY} mt-2">${btnLabel}</button>`:''}
+  </div>`;
+}
+
+function renderDashboard(){
+  const clientes = Store.all('clientes'), locales = Store.all('locales'), servicios = Store.all('servicios');
+  const proyectos = Store.all('proyectos'), tareas = Store.all('tareas'), pagos = Store.all('pagos');
+  const eventos = Store.all('eventos'), contenido = Store.all('contenido');
+  const activos = clientes.filter(c=>c.estado==='Cliente activo').length;
+  const prospectos = clientes.filter(c=>['Prospecto','Contactado','En negociación','Cliente pausado'].includes(c.estado)).length;
+  const servActivos = servicios.filter(s=>s.estado==='Activo').length;
+  const proyActivos = proyectos.filter(p=>!['Finalizado','Publicado'].includes(p.estado)).length;
+  const tareasPend = tareas.filter(t=>t.estado!=='Hecho').length;
+  const pagosPend = pagos.filter(p=>p.estado!=='Al día').length;
+  const valorTotal = pagos.reduce((a,p)=>a+parseMoney(p.precio),0);
+  const hoy = todayStr();
+  const atrasadas = tareas.filter(t=>t.estado!=='Hecho' && t.fecha_limite && t.fecha_limite<hoy).length;
+  const isEmpty = !clientes.length && !locales.length && !servicios.length && !proyectos.length && !tareas.length && !pagos.length && !eventos.length && !contenido.length;
+  document.getElementById('view-dashboard').innerHTML = `
+    <div class="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 border border-slate-800 p-6 sm:p-10 rounded-3xl shadow-xl flex flex-col md:flex-row md:items-center md:justify-between gap-6 sm:gap-8">
+      <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 space-y-3">
+        <span class="inline-block px-3 py-1 bg-indigo-500/10 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-full uppercase tracking-wider">Centro de Mando</span>
+        <div class="pt-1">
+          <img src="logo-blanco.png" alt="PROJECT" class="logo-on-dark h-10 w-auto object-contain select-none pointer-events-none opacity-95">
+          <img src="logo-negro.png" alt="PROJECT" class="logo-on-light h-10 w-auto object-contain select-none pointer-events-none">
+        </div>
+        <p class="text-slate-400 text-sm max-w-xl leading-relaxed">Control centralizado de clientes, locales, proyectos y finanzas en tiempo real.</p>
+      </div>
+      <div class="relative z-10 flex flex-col sm:flex-row gap-3">
+        ${can('clientes','edit')?`<button onclick="formCliente()" class="${BTN_PRIMARY}">+ Nuevo Cliente</button>`:''}
+        ${can('proyectos','edit')?`<button onclick="formProyecto()" class="${BTN_GHOST}">+ Nuevo Proyecto</button>`:''}
+      </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+      <div class="ui-card p-6 sm:p-8 rounded-3xl shadow-lg space-y-4">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Clientes Activos</p>
+        <h3 class="stat-number text-3xl font-extrabold">${activos}</h3>
+        <span class="inline-block text-[11px] text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-900/50 px-2.5 py-1 rounded-full">${prospectos} prospectos en CRM</span>
+      </div>
+      <div class="ui-card p-6 sm:p-8 rounded-3xl shadow-lg space-y-4">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Locales</p>
+        <h3 class="stat-number text-3xl font-extrabold">${locales.length}</h3>
+        <span class="inline-block text-[11px] text-blue-400 font-semibold bg-blue-950/60 border border-blue-900/50 px-2.5 py-1 rounded-full">${servActivos} servicios activos</span>
+      </div>
+      <div class="ui-card p-6 sm:p-8 rounded-3xl shadow-lg space-y-4">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Tareas Pendientes</p>
+        <h3 class="stat-number text-3xl font-extrabold">${tareasPend}</h3>
+        <span class="inline-block text-[11px] text-amber-400 font-semibold bg-amber-950/60 border border-amber-900/50 px-2.5 py-1 rounded-full">${atrasadas} atrasadas · ${proyActivos} proyectos</span>
+      </div>
+      <div class="ui-card p-6 sm:p-8 rounded-3xl shadow-lg space-y-4">
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Valor Contratado</p>
+        <h3 class="stat-number text-3xl font-extrabold">${fmtMoney(valorTotal)}</h3>
+        <span class="inline-block text-[11px] text-red-400 font-semibold bg-red-950/60 border border-red-900/50 px-2.5 py-1 rounded-full">${pagosPend} pagos pendientes/vencidos</span>
+      </div>
+    </div>
+    ${isEmpty ? `
+      <div class="ui-card rounded-3xl shadow-lg">
+        ${emptyState('🚀','Empieza por aquí','No tienes datos todavía. Crea tu primer cliente para comenzar a operar.','formCliente()','+ Crear primer cliente')}
+      </div>` : `
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-8">
+        <div class="ui-card p-6 sm:p-7 rounded-3xl shadow-lg"><h3 class="text-base font-bold text-white mb-5">Ingresos contratados por mes</h3><div id="chart-ingresos"></div></div>
+        <div class="ui-card p-6 sm:p-7 rounded-3xl shadow-lg"><h3 class="text-base font-bold text-white mb-5">Proyectos por fase</h3><div id="chart-proyectos"></div></div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-8">
+        <div class="ui-card p-6 sm:p-7 rounded-3xl shadow-lg"><h3 class="text-base font-bold text-white mb-5">Clientes por estado</h3><div id="chart-clientes"></div></div>
+        <div class="ui-card p-6 sm:p-7 rounded-3xl shadow-lg"><h3 class="text-base font-bold text-white mb-5">Tareas por estado</h3><div id="chart-tareas"></div></div>
+        <div class="ui-card p-6 sm:p-7 rounded-3xl shadow-lg"><h3 class="text-base font-bold text-white mb-5">Top clientes</h3><div id="top-clientes"></div></div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 sm:gap-8">
+        <div class="ui-card p-6 sm:p-7 rounded-3xl shadow-lg"><h3 class="text-base font-bold text-white mb-5">Próximos eventos (7 días)</h3><div id="w-events" class="space-y-3"></div></div>
+        <div class="ui-card p-6 sm:p-7 rounded-3xl shadow-lg"><h3 class="text-base font-bold text-white mb-5">Próximas publicaciones</h3><div id="w-posts" class="space-y-3"></div></div>
+        <div class="ui-card p-6 sm:p-7 rounded-3xl shadow-lg"><h3 class="text-base font-bold text-white mb-5">Servicios por vencer</h3><div id="w-venc" class="space-y-3"></div></div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-8">
+        <div class="ui-card p-6 sm:p-7 rounded-3xl shadow-lg"><h3 class="text-base font-bold text-white mb-5">Tareas pendientes y próximas</h3><div class="overflow-x-auto"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-slate-800 text-[11px] font-bold text-slate-500 uppercase"><th class="py-3.5 px-3">Tarea</th><th class="py-3.5 px-3">Cliente</th><th class="py-3.5 px-3">Resp.</th><th class="py-3.5 px-3">Vence</th><th class="py-3.5 px-3">Estado</th></tr></thead><tbody id="dash-tasks" class="divide-y divide-slate-800/60 text-sm"></tbody></table></div></div>
+        <div class="ui-card p-6 sm:p-7 rounded-3xl shadow-lg"><h3 class="text-base font-bold text-white mb-5">Actividad reciente</h3><div id="dash-activity" class="space-y-4"></div></div>
+      </div>`}`;
+  if(isEmpty) return;
+  const meses = {};
+  pagos.forEach(p=>{ if(!p.fecha_vencimiento||p.fecha_vencimiento==='—')return; const m=p.fecha_vencimiento.slice(0,7); meses[m]=(meses[m]||0)+parseMoney(p.precio); });
+  const mesesKeys = Object.keys(meses).sort();
+  const cIng = document.getElementById('chart-ingresos'); if(cIng) cIng.innerHTML = barChartSVG(mesesKeys.map(m=>({label:m.slice(5)+'/'+m.slice(2,4),value:meses[m]})));
+  const fasesCol = {}; ESTADOS_PROY.forEach(f=>fasesCol[f]=0);
+  proyectos.forEach(p=>{fasesCol[p.estado]=(fasesCol[p.estado]||0)+1;});
+  const cProy = document.getElementById('chart-proyectos'); if(cProy) cProy.innerHTML = pieChartSVG(Object.entries(fasesCol).filter(([,v])=>v>0).map(([k,v])=>({label:k,value:v})));
+  const cliEst = {}; clientes.forEach(c=>{cliEst[c.estado]=(cliEst[c.estado]||0)+1;});
+  const cCli = document.getElementById('chart-clientes'); if(cCli) cCli.innerHTML = pieChartSVG(Object.entries(cliEst).map(([k,v])=>({label:k,value:v})));
+  const tarEst = {}; COLUMNAS_TAREAS.forEach(c=>tarEst[c]=0);
+  tareas.forEach(t=>{tarEst[t.estado]=(tarEst[t.estado]||0)+1;});
+  const cTar = document.getElementById('chart-tareas'); if(cTar) cTar.innerHTML = barChartSVG(Object.entries(tarEst).map(([k,v])=>({label:k,value:v})));
+  const cliValor = {}; pagos.forEach(p=>{cliValor[p.cliente_id]=(cliValor[p.cliente_id]||0)+parseMoney(p.precio);});
+  const top = Object.entries(cliValor).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const tcEl = document.getElementById('top-clientes');
+  if(tcEl) tcEl.innerHTML = top.length ? top.map(([id,v])=>`<div class="flex justify-between py-2.5 border-b border-slate-800/60 text-sm"><span class="text-slate-300">${esc(clienteName(id))}</span><strong class="text-white">${fmtMoney(v)}</strong></div>`).join('') : '<div class="text-slate-500 text-center py-6 text-sm">Sin datos</div>';
+  const en7 = toLocalDateStr(addDays(new Date(),7));
+  const prox = eventos.filter(e=>e.fecha>=hoy&&e.fecha<=en7).sort((a,b)=>a.fecha.localeCompare(b.fecha)).slice(0,5);
+  const weEl = document.getElementById('w-events');
+  if(weEl) weEl.innerHTML = prox.length ? prox.map(e=>`<div class="py-3 border-b border-slate-800/60 text-sm">${badge(e.tipo)} <strong class="ml-2 text-white">${esc(e.detalle)}</strong><div class="text-slate-500 text-xs mt-1.5">${e.fecha} · ${esc(clienteName(e.cliente_id))}</div></div>`).join('') : '<div class="text-slate-500 text-center py-6 text-sm">Sin eventos próximos</div>';
+  const posts = contenido.filter(c=>c.fecha_publicacion>=hoy&&c.estado!=='Publicado').sort((a,b)=>a.fecha_publicacion.localeCompare(b.fecha_publicacion)).slice(0,5);
+  const wpEl = document.getElementById('w-posts');
+  if(wpEl) wpEl.innerHTML = posts.length ? posts.map(c=>`<div class="py-3 border-b border-slate-800/60 text-sm"><strong class="text-white">${esc(c.titulo)}</strong> ${badge(c.estado)}<div class="text-slate-500 text-xs mt-1.5">${c.fecha_publicacion} · ${esc(clienteName(c.cliente_id))}</div></div>`).join('') : '<div class="text-slate-500 text-center py-6 text-sm">Sin publicaciones programadas</div>';
+  const porVencer = pagos.filter(p=>p.estado!=='Al día'&&p.fecha_vencimiento&&p.fecha_vencimiento>=hoy&&p.fecha_vencimiento<=en7).slice(0,5);
+  const wvEl = document.getElementById('w-venc');
+  if(wvEl) wvEl.innerHTML = porVencer.length ? porVencer.map(p=>`<div class="py-3 border-b border-slate-800/60 text-sm"><strong class="text-white">${esc(p.servicio)}</strong><div class="text-slate-500 text-xs mt-1.5">${esc(clienteName(p.cliente_id))} · Vence ${p.fecha_vencimiento}</div></div>`).join('') : '<div class="text-slate-500 text-center py-6 text-sm">Sin vencimientos próximos</div>';
+  const tareasOrden = tareas.filter(t=>t.estado!=='Hecho').sort((a,b)=>(a.fecha_limite||'').localeCompare(b.fecha_limite||'')).slice(0,8);
+  const dtEl = document.getElementById('dash-tasks');
+  if(dtEl) dtEl.innerHTML = tareasOrden.map(t=>`<tr><td class="py-3 px-3 text-white">${esc(t.titulo)}</td><td class="py-3 px-3 text-slate-400">${esc(clienteName(t.cliente_id))}</td><td class="py-3 px-3 text-slate-400">${esc(t.responsable||'—')}</td><td class="py-3 px-3 text-slate-400">${esc(t.fecha_limite||'—')}</td><td class="py-3 px-3">${badge(t.estado)}</td></tr>`).join('') || '<tr><td colspan="5" class="py-8 text-center text-slate-500 text-sm">Sin tareas pendientes</td></tr>';
+  const act = Store.all('actividad').slice(0,8);
+  const daEl = document.getElementById('dash-activity');
+  if(daEl) daEl.innerHTML = act.length ? act.map(a=>`<div class="flex space-x-3 text-sm items-start"><div class="w-2 h-2 rounded-full bg-indigo-500 mt-2 shrink-0"></div><div><p class="text-slate-200"><b>${esc(a.user_name)}</b> — ${esc(a.accion)}</p><p class="text-[11px] text-slate-500 mt-0.5">${new Date(a.created_at).toLocaleString('es-CO')}</p></div></div>`).join('') : '<div class="text-slate-500 text-center py-6 text-sm">Sin actividad</div>';
+}
+
+function barChartSVG(data){
+  if(!data.length) return '<div class="text-slate-500 text-center py-8 text-sm">Sin datos</div>';
+  const W=380,H=180,pad=30;
+  const max = Math.max(...data.map(d=>d.value),1);
+  const bw = (W-pad*2)/data.length*0.7;
+  const gap = (W-pad*2)/data.length*0.3;
+  let bars = '';
+  data.forEach((d,i)=>{
+    const bh = (d.value/max)*(H-pad*2);
+    const x = pad+i*(bw+gap);
+    const y = H-pad-bh;
+    bars += `<rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="4" fill="url(#gBar)"/><text x="${x+bw/2}" y="${H-pad+14}" font-size="9" fill="#94a3b8" text-anchor="middle">${esc(d.label)}</text><text x="${x+bw/2}" y="${y-4}" font-size="9.5" fill="#e2e8f0" text-anchor="middle" font-weight="700">${d.value>999?Math.round(d.value/1000)+'k':d.value}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" class="w-full h-auto"><defs><linearGradient id="gBar" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#818cf8"/><stop offset="100%" stop-color="#4338ca"/></linearGradient></defs><line x1="${pad}" y1="${H-pad}" x2="${W-pad}" y2="${H-pad}" stroke="#334155"/>${bars}</svg>`;
+}
+
+function pieChartSVG(data){
+  if(!data.length) return '<div class="text-slate-500 text-center py-8 text-sm">Sin datos</div>';
+  const total = data.reduce((a,d)=>a+d.value,0);
+  const colors = ['#6366f1','#8b5cf6','#10b981','#f59e0b','#ef4444','#0ea5e9','#a855f7','#ec4899'];
+  const W=380,H=180,cx=90,cy=H/2,r=65;
+  let acc=0, slices='';
+  data.forEach((d,i)=>{
+    const pct = d.value/total;
+    const a0 = acc*2*Math.PI-Math.PI/2;
+    const a1 = (acc+pct)*2*Math.PI-Math.PI/2;
+    acc += pct;
+    const x0 = cx+r*Math.cos(a0), y0 = cy+r*Math.sin(a0);
+    const x1 = cx+r*Math.cos(a1), y1 = cy+r*Math.sin(a1);
+    const large = pct>0.5?1:0;
+    slices += `<path d="M ${cx} ${cy} L ${x0} ${y0} A ${r} ${r} 0 ${large} 1 ${x1} ${y1} Z" fill="${colors[i%colors.length]}" opacity=".9"/>`;
+  });
+  const legend = data.map((d,i)=>`<span class="flex items-center gap-2 text-xs text-slate-300"><span class="w-3 h-3 rounded-sm inline-block" style="background:${colors[i%colors.length]}"></span>${esc(d.label)} (${d.value})</span>`).join('');
+  return `<div class="flex gap-5 items-center flex-wrap"><svg viewBox="0 0 190 180" style="max-width:180px;"><g>${slices}</g><circle cx="${cx}" cy="${cy}" r="${r*0.5}" fill="#0f172a"/><text x="${cx}" y="${cy+4}" font-size="16" font-weight="800" fill="#e2e8f0" text-anchor="middle">${total}</text></svg><div class="flex flex-col gap-2">${legend}</div></div>`;
+}
+
+let _searchClientesTimer = null;
+function onSearchClientesInput(){
+  const input = document.getElementById('search-clientes');
+  if(!input) return;
+  const wasFocused = document.activeElement === input;
+  let cursorPos = 0;
+  try { cursorPos = input.selectionStart ?? 0; } catch(e){}
+  if(_searchClientesTimer) clearTimeout(_searchClientesTimer);
+  _searchClientesTimer = setTimeout(() => {
+    updateClientesGrid();
+    const input2 = document.getElementById('search-clientes');
+    if(input2 && wasFocused && document.activeElement !== input2){
+      try {
+        input2.focus({ preventScroll: true });
+        input2.setSelectionRange(cursorPos, cursorPos);
+      } catch(e){}
+    }
+  }, 120);
+}
+
+function renderClientes(){
+  const v = document.getElementById('view-clientes');
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Clientes</h1><p class="text-slate-400 text-sm mt-2">Control centralizado de clientes y su estado comercial.</p></div>
+      <div class="flex gap-3 flex-wrap">
+        <button onclick="exportCSV('clientes')" class="${BTN_GHOST}">Exportar CSV</button>
+        ${can('clientes','edit')?`<button onclick="formCliente()" class="${BTN_PRIMARY}">+ Nuevo Cliente</button>`:''}
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-4">
+      <input id="search-clientes" placeholder="Buscar cliente..." oninput="onSearchClientesInput()" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="${INPUT} sm:max-w-xs">
+      <select id="filter-clientes" onchange="updateClientesGrid()" class="${INPUT} sm:max-w-xs">
+        <option value="">Todos los estados</option>
+        ${ESTADOS_CLIENTE.map(e=>`<option>${e}</option>`).join('')}
+      </select>
+    </div>
+    <div id="clientes-grid"></div>
+  `;
+  updateClientesGrid();
+}
+
+function updateClientesGrid(){
+  const grid = document.getElementById('clientes-grid');
+  if(!grid) return;
+  const q = (document.getElementById('search-clientes')?.value || '').toLowerCase();
+  const f = (document.getElementById('filter-clientes')?.value || '');
+  const list = Store.all('clientes').filter(c=>{
+    if(f && c.estado!==f) return false;
+    if(q && !(c.nombre.toLowerCase().includes(q)||(c.contacto||'').toLowerCase().includes(q))) return false;
+    return true;
+  });
+  const locales = Store.all('locales');
+  if(!list.length){
+    grid.innerHTML = `<div class="ui-card rounded-3xl shadow-lg">${emptyState('👥','Sin clientes todavía','Registra tu primer cliente para empezar a gestionar la cartera.','formCliente()','+ Crear cliente')}</div>`;
+    return;
+  }
+  grid.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+    ${list.map(c=>{
+      const nLoc = locales.filter(l=>String(l.cliente_id)===String(c.id)).length;
+      return `<div class="${CARD}">
+        <div>
+          <div class="flex justify-between items-start gap-3">
+            <div class="min-w-0"><h3 class="font-bold text-white text-lg tracking-tight truncate">${esc(c.nombre)}</h3><p class="text-xs text-slate-400 font-semibold mt-1 truncate">${esc(c.contacto||'Sin contacto')}</p></div>
+            ${badge(c.estado)}
+          </div>
+          <div class="mt-5 space-y-2.5 text-sm text-slate-300">
+            <p class="truncate">📞 ${esc(c.telefono||c.whatsapp||'—')}</p>
+            <p class="truncate">✉️ ${esc(c.email||'—')}</p>
+            <p class="truncate">📍 ${esc(c.ciudad||'—')} · ${nLoc} local(es)</p>
+          </div>
+        </div>
+        ${actionButtons('Cliente',c.id)}
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderEmpresas(){
+  const v = document.getElementById('view-empresas');
+  const locales = Store.all('locales');
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Empresas y Locales</h1><p class="text-slate-400 text-sm mt-2">Todo local donde ofrecemos servicios.</p></div>
+      ${can('empresas','edit')?`<button onclick="formLocal()" class="${BTN_PRIMARY}">+ Nuevo Local</button>`:''}
+    </div>
+    ${locales.length ? `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+      ${locales.map(l=>`
+        <div class="${CARD}">
+          <div>
+            <h3 class="font-bold text-white text-lg tracking-tight truncate">${esc(l.nombre)}</h3>
+            <p class="text-xs text-slate-400 font-semibold mt-1 truncate">Cliente: ${esc(clienteName(l.cliente_id))}</p>
+            <div class="mt-5 space-y-2.5 text-sm text-slate-300">
+              <p class="truncate">📍 ${esc(l.direccion||'—')} · ${esc(l.ciudad||'—')}</p>
+              <p class="truncate">🕒 ${esc(l.horario||'—')}</p>
+              <p class="truncate">👤 ${esc(l.responsable||'—')}</p>
+            </div>
+          </div>
+          ${actionButtons('Local',l.id)}
+        </div>`).join('')}
+    </div>` : `<div class="ui-card rounded-3xl shadow-lg">${emptyState('🏢','Sin locales registrados','Crea tu primer local una vez tengas al menos un cliente.','formLocal()','+ Crear local')}</div>`}`;
+}
+
+function renderServicios(){
+  const v = document.getElementById('view-servicios');
+  const list = Store.all('servicios');
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Catálogo de Servicios</h1><p class="text-slate-400 text-sm mt-2">Servicios ofrecidos y precios base.</p></div>
+      ${can('servicios','edit')?`<button onclick="formServicio()" class="${BTN_PRIMARY}">+ Nuevo Servicio</button>`:''}
+    </div>
+    ${list.length ? `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+      ${list.map(s=>`
+        <div class="${CARD}">
+          <div>
+            <div class="flex justify-between items-start gap-3">
+              <h3 class="font-bold text-white text-lg tracking-tight truncate">${esc(s.nombre)}</h3>
+              <span class="text-sm font-extrabold text-white shrink-0">$${Number(s.precio_base||0).toLocaleString()}</span>
+            </div>
+            <p class="text-xs text-slate-400 font-semibold mt-1.5">${esc(s.categoria)} · ${esc(s.tipo_cobro)}</p>
+            <p class="text-sm text-slate-300 mt-4">${esc(s.descripcion||'Sin descripción.')}</p>
+            <div class="mt-4">${badge(s.estado)}</div>
+          </div>
+          ${actionButtons('Servicio',s.id)}
+        </div>`).join('')}
+    </div>` : `<div class="ui-card rounded-3xl shadow-lg">${emptyState('🧩','Sin servicios en catálogo','Agrega los servicios que ofrece tu agencia con sus precios base.','formServicio()','+ Crear servicio')}</div>`}`;
+}
+
+function renderPagos(){
+  const v = document.getElementById('view-pagos');
+  const pagos = Store.all('pagos');
+  const filtroActual = document.getElementById('filter-pagos')?.value || '';
+  const list = pagos.filter(p => !filtroActual || p.estado === filtroActual);
+  const alDia = pagos.filter(p=>p.estado==='Al día').length;
+  const pend = pagos.filter(p=>p.estado==='Pendiente').length;
+  const venc = pagos.filter(p=>p.estado==='Vencido').length;
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Pagos y Contratos</h1><p class="text-slate-400 text-sm mt-2">Servicios contratados, precios y estado de pago.</p></div>
+      <div class="flex gap-3 flex-wrap">
+        <button onclick="exportCSV('pagos')" class="${BTN_GHOST}">Exportar CSV</button>
+        ${can('pagos','edit')?`<button onclick="formPago()" class="${BTN_PRIMARY}">+ Nuevo Pago</button>`:''}
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-4">
+      <select id="filter-pagos" onchange="renderPagos()" class="${INPUT} sm:max-w-xs">
+        <option value="" ${filtroActual===''?'selected':''}>Todos los estados</option>
+        ${ESTADOS_PAGO.map(e=>`<option ${filtroActual===e?'selected':''}>${e}</option>`).join('')}
+      </select>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div class="ui-card p-5 sm:p-6 rounded-2xl"><p class="text-xs text-slate-500 uppercase">Total</p><h3 class="text-2xl font-extrabold text-white mt-2">${pagos.length}</h3></div>
+      <div class="ui-card p-5 sm:p-6 rounded-2xl"><p class="text-xs text-slate-500 uppercase">Al día</p><h3 class="text-2xl font-extrabold text-emerald-400 mt-2">${alDia}</h3></div>
+      <div class="ui-card p-5 sm:p-6 rounded-2xl"><p class="text-xs text-slate-500 uppercase">Pendientes</p><h3 class="text-2xl font-extrabold text-amber-400 mt-2">${pend}</h3></div>
+      <div class="ui-card p-5 sm:p-6 rounded-2xl"><p class="text-xs text-slate-500 uppercase">Vencidos</p><h3 class="text-2xl font-extrabold text-red-400 mt-2">${venc}</h3></div>
+    </div>
+    ${list.length ? `<div class="ui-card rounded-3xl overflow-hidden shadow-lg">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead><tr class="border-b border-slate-800 text-[11px] font-bold text-slate-500 uppercase bg-slate-950/50">
+            <th class="py-4 px-4 sm:px-6">Cliente / Local</th><th class="py-4 px-4 sm:px-6">Servicio</th><th class="py-4 px-4 sm:px-6">Precio</th><th class="py-4 px-4 sm:px-6">Forma</th><th class="py-4 px-4 sm:px-6">Vence</th><th class="py-4 px-4 sm:px-6">Estado</th><th class="py-4 px-4 sm:px-6 text-right">Acciones</th>
+          </tr></thead>
+          <tbody class="divide-y divide-slate-800/60 text-sm">
+            ${list.map(p=>`<tr class="hover:bg-slate-800/30 transition">
+              <td class="py-4 px-4 sm:px-6 font-semibold text-white">${esc(p.local_id&&localName(p.local_id)!=='—'?localName(p.local_id):clienteName(p.cliente_id))}</td>
+              <td class="py-4 px-4 sm:px-6 text-slate-300">${esc(p.servicio)}</td>
+              <td class="py-4 px-4 sm:px-6 font-bold text-white">$${Number(p.precio||0).toLocaleString()}</td>
+              <td class="py-4 px-4 sm:px-6 text-slate-400 text-xs">${esc(p.forma_pago||'—')}</td>
+              <td class="py-4 px-4 sm:px-6 text-slate-400 text-xs">${esc(p.fecha_vencimiento||'—')}</td>
+              <td class="py-4 px-4 sm:px-6">${badge(p.estado)}</td>
+              <td class="py-4 px-4 sm:px-6">${actionButtons('Pago',p.id)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>` : `<div class="ui-card rounded-3xl shadow-lg">${emptyState('💳','Sin pagos registrados','Registra contratos y pagos de servicios para llevar el control financiero.','formPago()','+ Crear pago')}</div>`}`;
+}
+
+function renderProyectos(){
+  const v = document.getElementById('view-proyectos');
+  const list = Store.all('proyectos');
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Proyectos</h1><p class="text-slate-400 text-sm mt-2">Fases, plazos y responsables.</p></div>
+      <div class="flex gap-3 flex-wrap">
+        <button onclick="exportCSV('proyectos')" class="${BTN_GHOST}">Exportar CSV</button>
+        ${can('proyectos','edit')?`<button onclick="formProyecto()" class="${BTN_PRIMARY}">+ Nuevo Proyecto</button>`:''}
+      </div>
+    </div>
+    ${list.length ? `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+      ${list.map(p=>`
+        <div class="${CARD}">
+          <div>
+            <div class="flex justify-between items-start mb-3 gap-3">
+              <h3 class="font-bold text-white text-lg tracking-tight truncate">${esc(p.nombre)}</h3>
+              ${badge(p.estado)}
+            </div>
+            <p class="text-xs text-slate-400 truncate">${esc(clienteName(p.cliente_id))} · Resp: ${esc(p.responsable||'—')} · Límite: ${esc(p.fecha_limite||'—')}</p>
+            <div class="mt-4 bg-slate-800 rounded-full h-2 overflow-hidden"><div style="width:${Math.min(100,Math.max(0,p.progreso||0))}%" class="h-full bg-gradient-to-r from-indigo-500 to-indigo-400"></div></div>
+            <div class="text-right text-[11px] text-slate-400 mt-1.5">${Math.min(100,Math.max(0,p.progreso||0))}%</div>
+          </div>
+          ${actionButtons('Proyecto',p.id)}
+        </div>`).join('')}
+    </div>` : `<div class="ui-card rounded-3xl shadow-lg">${emptyState('📁','Sin proyectos activos','Cuando tengas clientes, crea proyectos y síguelos aquí.','formProyecto()','+ Crear proyecto')}</div>`}`;
+}
+
+let DRAG_TAREA = null;
+function renderKanban(){
+  const v = document.getElementById('view-tareas');
+  const tareas = Store.all('tareas');
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Tareas</h1><p class="text-slate-400 text-sm mt-2">Arrastra las tarjetas para cambiar el estado.</p></div>
+      ${can('tareas','edit')?`<button onclick="formTarea()" class="${BTN_PRIMARY}">+ Nueva Tarea</button>`:''}
+    </div>
+    ${tareas.length ? `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+      ${COLUMNAS_TAREAS.map(col=>{
+        const items = tareas.filter(t=>t.estado===col);
+        return `<div class="kcol bg-slate-900/60 border border-slate-800 rounded-2xl p-4" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDropTarea(event,'${col}')">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex justify-between mb-3"><span>${col}</span><span class="text-slate-500">${items.length}</span></h4>
+          ${items.map(t=>`<div class="ktask bg-slate-900 border border-slate-800 rounded-xl p-3.5 mb-3 text-sm cursor-grab hover:border-slate-700 transition" draggable="true" ondragstart="onDragStart(event,'${t.id}')" ondragend="onDragEnd(event)" onclick="editarTarea('${t.id}')">
+            <div class="flex items-start justify-between gap-2 mb-1.5">
+              <div class="text-[10px]">${PRIO_EMOJI[t.prioridad]||'🟡'}</div>
+              ${can('tareas','edit')?`<button onclick="event.stopPropagation(); eliminarTarea('${t.id}')" title="Eliminar tarea" class="text-slate-600 hover:text-red-400 transition text-xs leading-none shrink-0">🗑️</button>`:''}
+            </div>
+            <strong class="text-white text-xs">${esc(t.titulo)}</strong>
+            <div class="text-slate-500 text-[11px] mt-1.5 truncate">${esc(clienteName(t.cliente_id))} · ${esc(t.responsable||'—')}</div>
+            ${t.fecha_limite?`<div class="text-[10px] mt-1.5 ${t.fecha_limite<todayStr()&&t.estado!=='Hecho'?'text-red-400':'text-slate-500'}">📅 ${t.fecha_limite}</div>`:''}
+          </div>`).join('') || '<div class="text-center text-slate-600 text-xs py-6">Vacío</div>'}
+        </div>`;
+      }).join('')}
+    </div>` : `<div class="ui-card rounded-3xl shadow-lg">${emptyState('✅','Sin tareas','Crea tareas para organizar el trabajo del equipo.','formTarea()','+ Crear tarea')}</div>`}`;
+}
+function onDragStart(e,id){ DRAG_TAREA=id; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
+function onDragEnd(e){ e.currentTarget.classList.remove('dragging'); DRAG_TAREA=null; }
+function onDragOver(e){ e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+function onDragLeave(e){ e.currentTarget.classList.remove('dragover'); }
+async function onDropTarea(e,col){
+  e.preventDefault(); e.currentTarget.classList.remove('dragover');
+  if(!DRAG_TAREA) return;
+  const t = Store.find('tareas',DRAG_TAREA);
+  if(!t || t.estado===col) return;
+  await Store.update('tareas',DRAG_TAREA,{estado:col},CURRENT_USER.nombre);
+  logActivity(`Movió tarea "${t.titulo}" a "${col}"`);
+  toast(`Movido a ${col}`); DRAG_TAREA=null;
+  renderKanban(); renderDashboard();
+}
+
+let DRAG_CONT = null;
+function renderContenido(){
+  const v = document.getElementById('view-contenido');
+  const items = Store.all('contenido');
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Contenido y Publicidad</h1><p class="text-slate-400 text-sm mt-2">Planificación y flujo de publicaciones.</p></div>
+      ${can('contenido','edit')?`<button onclick="formContenido()" class="${BTN_PRIMARY}">+ Nuevo Contenido</button>`:''}
+    </div>
+    ${items.length ? `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
+      ${ESTADOS_CONT.map(col=>{
+        const list = items.filter(c=>c.estado===col);
+        return `<div class="kcol bg-slate-900/60 border border-slate-800 rounded-2xl p-4" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDropCont(event,'${col}')">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex justify-between mb-3"><span>${col}</span><span class="text-slate-500">${list.length}</span></h4>
+          ${list.map(c=>`<div class="ktask bg-slate-900 border border-slate-800 rounded-xl p-3.5 mb-3 text-sm cursor-grab hover:border-slate-700 transition" draggable="true" ondragstart="onDragStartCont(event,'${c.id}')" ondragend="onDragEndCont(event)" onclick="editarContenido('${c.id}')">
+            <strong class="text-white text-xs">${esc(c.titulo)}</strong>
+            <div class="text-slate-500 text-[11px] mt-1.5 truncate">${esc(c.plataforma||'')} · ${esc(clienteName(c.cliente_id))}</div>
+            ${c.fecha_publicacion?`<div class="text-slate-500 text-[10px] mt-1.5">📅 ${c.fecha_publicacion}</div>`:''}
+          </div>`).join('') || '<div class="text-center text-slate-600 text-xs py-6">Vacío</div>'}
+        </div>`;
+      }).join('')}
+    </div>` : `<div class="ui-card rounded-3xl shadow-lg">${emptyState('🎨','Sin contenido planificado','Programa publicaciones, reels e historias para tus clientes.','formContenido()','+ Crear contenido')}</div>`}`;
+}
+function onDragStartCont(e,id){ DRAG_CONT=id; e.currentTarget.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
+function onDragEndCont(e){ e.currentTarget.classList.remove('dragging'); DRAG_CONT=null; }
+async function onDropCont(e,col){
+  e.preventDefault(); e.currentTarget.classList.remove('dragover');
+  if(!DRAG_CONT) return;
+  const c = Store.find('contenido',DRAG_CONT);
+  if(!c || c.estado===col) return;
+  await Store.update('contenido',DRAG_CONT,{estado:col},CURRENT_USER.nombre);
+  logActivity(`Movió contenido "${c.titulo}" a "${col}"`);
+  toast(`Movido a ${col}`); DRAG_CONT=null;
+  renderContenido(); renderDashboard();
+}
+
+function renderComercial(){
+  const v = document.getElementById('view-comercial');
+  const items = Store.all('comercial');
+  const grouped = {};
+  items.forEach(i=>{(grouped[i.local_id]=grouped[i.local_id]||[]).push(i);});
+  const claves = Object.keys(grouped);
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Información Comercial</h1><p class="text-slate-400 text-sm mt-2">Horarios, precios, eventos y promociones.</p></div>
+      ${can('comercial','edit')?`<button onclick="formComercial()" class="${BTN_PRIMARY}">+ Nueva Información</button>`:''}
+    </div>
+    ${claves.length ? `<div class="space-y-6 sm:space-y-8">
+      ${claves.map(lid=>{
+        const loc = localById(lid);
+        return `<div class="ui-card p-6 sm:p-7 rounded-3xl shadow-lg">
+          <h3 class="text-base font-bold text-white mb-4">${esc(loc?.nombre||'—')} <span class="text-slate-500 font-normal text-sm">· ${esc(clienteName(loc?.cliente_id))}</span></h3>
+          <div class="space-y-2">
+            ${grouped[lid].map(i=>`<div class="flex justify-between items-center py-3 border-b border-slate-800/60 gap-3 flex-wrap">
+              <div class="min-w-0">${badge(i.categoria)} <strong class="ml-2 text-white">${esc(i.nombre)}</strong><div class="text-slate-400 text-xs mt-1.5">${esc(i.valor||'')} ${i.notas?'· '+esc(i.notas):''}</div></div>
+              <div class="flex space-x-2">
+                <button onclick="editarComercial('${i.id}')" class="${BTN_SM}">✏️</button>
+                <button onclick="eliminarComercial('${i.id}')" class="${BTN_SM} hover:bg-red-950/60">🗑️</button>
+              </div>
+            </div>`).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : `<div class="ui-card rounded-3xl shadow-lg">${emptyState('📋','Sin información comercial','Registra horarios, precios, eventos y promociones por local para reutilizarlos en publicidad.','formComercial()','+ Crear información')}</div>`}`;
+}
+
+let VISTA_CAL = 'lista';
+let MES_CAL = new Date();
+function toggleVistaCal(){ VISTA_CAL = VISTA_CAL==='lista'?'mes':'lista'; renderCalendario(); }
+function cambiarMes(d){ MES_CAL.setMonth(MES_CAL.getMonth()+d); VISTA_CAL='mes'; renderCalendario(); }
+function renderCalendario(){
+  const v = document.getElementById('view-calendario');
+  const eventos = Store.all('eventos');
+  let content = '';
+  if(!eventos.length){
+    content = emptyState('📅','Sin eventos en el calendario','Registra eventos, publicaciones, reuniones y vencimientos para verlos aquí.','formEvento()','+ Crear evento');
+  } else if(VISTA_CAL === 'mes'){
+    const year = MES_CAL.getFullYear(), month = MES_CAL.getMonth();
+    const first = new Date(year,month,1);
+    const startDay = (first.getDay()+6)%7;
+    const daysInMonth = new Date(year,month+1,0).getDate();
+    const prevDays = new Date(year,month,0).getDate();
+    const dias = [];
+    for(let i=startDay-1;i>=0;i--) dias.push({fecha:new Date(year,month-1,prevDays-i),other:true});
+    for(let d=1;d<=daysInMonth;d++) dias.push({fecha:new Date(year,month,d),other:false});
+    while(dias.length%7!==0) dias.push({fecha:new Date(year,month+1,dias.length-startDay-daysInMonth+1),other:true});
+    const hoyStr = todayStr();
+    content = `<div class="grid grid-cols-7 gap-1.5 sm:gap-2">${['L','M','X','J','V','S','D'].map(d=>`<div class="text-[10px] sm:text-[11px] font-bold text-center text-slate-500 uppercase py-2 sm:py-3">${d}</div>`).join('')}
+      ${dias.map(d=>{
+        const f = toLocalDateStr(d.fecha);
+        const evs = eventos.filter(e=>e.fecha===f);
+        const cls = `cal-day bg-slate-900/60 border rounded-xl p-1.5 sm:p-2.5 text-xs flex flex-col gap-1 overflow-hidden ${d.other?'opacity-30':'border-slate-800'} ${f===hoyStr?'border-indigo-500 border-2':''}`;
+        return `<div class="${cls}">
+          <div class="font-bold text-slate-300 text-[10px] sm:text-[11px] mb-0.5 sm:mb-1">${d.fecha.getDate()}</div>
+          ${evs.slice(0,3).map(e=>`<div class="hidden sm:block text-[10px] truncate bg-slate-800 px-2 py-1 rounded border-l-2 ${e.tipo==='Vencimiento'?'border-red-500':e.tipo==='Publicación'?'border-emerald-500':e.tipo==='Reunión'?'border-slate-400':'border-amber-500'}">${esc(e.detalle)}</div>`).join('')}
+          <div class="sm:hidden flex flex-wrap gap-0.5">${evs.slice(0,3).map(e=>`<span class="w-1.5 h-1.5 rounded-full ${e.tipo==='Vencimiento'?'bg-red-500':e.tipo==='Publicación'?'bg-emerald-500':e.tipo==='Reunión'?'bg-slate-400':'bg-amber-500'}"></span>`).join('')}${evs.length>3?`<span class="text-[8px] text-slate-500 ml-0.5">+${evs.length-3}</span>`:''}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  } else {
+    const list = eventos.slice().sort((a,b)=>a.fecha.localeCompare(b.fecha));
+    const hoy = todayStr();
+    let last = '';
+    let html = '';
+    list.forEach(e=>{
+      if(e.fecha!==last){
+        const d = new Date(e.fecha+'T00:00:00');
+        const label = d.toLocaleDateString('es-CO',{weekday:'long',day:'numeric',month:'long'});
+        html += `<div class="mt-5 mb-3 text-xs font-bold ${e.fecha<hoy?'text-red-400':'text-slate-400'} capitalize">${label}${e.fecha<hoy?' · vencido':''}</div>`;
+        last = e.fecha;
+      }
+      html += `<div class="flex justify-between items-center gap-3 py-4 px-4 sm:px-5 border border-slate-800 rounded-2xl mb-3 flex-wrap">
+        <div class="min-w-0">${badge(e.tipo)} <strong class="ml-2 text-white">${esc(e.detalle)}</strong><div class="text-slate-400 text-xs mt-2">${esc(clienteName(e.cliente_id))}${e.hora&&e.hora!=='—'?' · '+esc(e.hora):''}</div></div>
+        <div class="flex space-x-2">
+          <button onclick="editarEvento('${e.id}')" class="${BTN_SM}">✏️</button>
+          <button onclick="eliminarEvento('${e.id}')" class="${BTN_SM} hover:bg-red-950/60">🗑️</button>
+        </div>
+      </div>`;
+    });
+    content = html;
+  }
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Calendario</h1><p class="text-slate-400 text-sm mt-2">Eventos, publicaciones y vencimientos.</p></div>
+      ${can('calendario','edit')?`<button onclick="formEvento()" class="${BTN_PRIMARY}">+ Nuevo Evento</button>`:''}
+    </div>
+    ${eventos.length ? `<div class="flex flex-wrap gap-3 items-center">
+      <button onclick="toggleVistaCal()" class="${BTN_GHOST}">Vista: ${VISTA_CAL==='lista'?'Lista':'Mes'}</button>
+      <button onclick="cambiarMes(-1)" class="${BTN_GHOST}">← Mes</button>
+      <span class="font-bold text-sm text-white px-2">${MES_CAL.toLocaleDateString('es-CO',{month:'long',year:'numeric'})}</span>
+      <button onclick="cambiarMes(1)" class="${BTN_GHOST}">Mes →</button>
+    </div>` : ''}
+    <div class="ui-card p-4 sm:p-7 rounded-3xl shadow-lg">${content}</div>`;
+}
+
+function renderCRM(){
+  const v = document.getElementById('view-crm');
+  const items = Store.all('crm');
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">CRM — Embudo</h1><p class="text-slate-400 text-sm mt-2">Contacto → Interesado → Negociación → Propuesta → Cliente.</p></div>
+      ${can('crm','edit')?`<button onclick="formCRM()" class="${BTN_PRIMARY}">+ Nuevo Prospecto</button>`:''}
+    </div>
+    ${items.length ? `<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+      ${ETAPAS_CRM.map(col=>{
+        const list = items.filter(i=>i.etapa===col);
+        return `<div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
+          <h4 class="text-xs font-bold uppercase text-slate-400 flex justify-between mb-3"><span>${col}</span><span>${list.length}</span></h4>
+          ${list.map(i=>`<div class="bg-slate-900 border border-slate-800 rounded-xl p-3.5 mb-3 cursor-pointer hover:border-slate-700 transition" onclick="editarCRM('${i.id}')">
+            <strong class="text-white text-sm">${esc(i.nombre)}</strong>
+            <div class="text-slate-500 text-[11px] mt-1.5">${esc(i.servicio_interes||'')}</div>
+            ${i.presupuesto_estimado?`<div class="text-slate-500 text-[10px] mt-1.5">💵 ${esc(i.presupuesto_estimado)}</div>`:''}
+          </div>`).join('') || '<div class="text-center text-slate-600 text-xs py-6">Vacío</div>'}
+        </div>`;
+      }).join('')}
+    </div>` : `<div class="ui-card rounded-3xl shadow-lg">${emptyState('🎯','Sin prospectos','Registra clientes potenciales y síguelos por el embudo comercial.','formCRM()','+ Crear prospecto')}</div>`}`;
+}
+
+const BUCKET = 'archivos';
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+const SIGNED_URL_EXPIRY = 60 * 60;
+function formatBytes(bytes){
+  if(!bytes) return '0 B';
+  const k = 1024;
+  const sizes = ['B','KB','MB','GB'];
+  const i = Math.floor(Math.log(bytes)/Math.log(k));
+  return (bytes/Math.pow(k,i)).toFixed(1) + ' ' + sizes[i];
+}
+function fileIcon(tipo){
+  if(!tipo) return '📄';
+  if(tipo.startsWith('image/')) return '🖼️';
+  if(tipo.startsWith('video/')) return '🎬';
+  if(tipo.startsWith('audio/')) return '🎵';
+  if(tipo.includes('pdf')) return '📕';
+  if(tipo.includes('zip') || tipo.includes('rar')) return '🗜️';
+  if(tipo.includes('word') || tipo.includes('document')) return '📘';
+  if(tipo.includes('excel') || tipo.includes('sheet')) return '📗';
+  return '📄';
+}
+async function renderArchivos(){
+  const v = document.getElementById('view-archivos');
+  const list = Store.all('archivos');
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Archivos</h1>
+        <p class="text-slate-400 text-sm mt-2">Logos, fotos, videos, contratos y documentos (máx ${formatBytes(MAX_FILE_SIZE)} por archivo). <span class="text-emerald-400">🔒 Almacenamiento privado — URLs firmadas válidas por 1 hora.</span></p>
+      </div>
+    </div>
+    <div class="ui-card p-5 sm:p-7 rounded-3xl shadow-lg">
+      <label id="dropzone" class="block border-2 border-dashed border-slate-800 rounded-2xl p-8 sm:p-12 text-center cursor-pointer hover:border-indigo-500/50 transition mb-6">
+        <div class="text-4xl mb-3">📎</div>
+        <div class="text-slate-300 text-sm font-semibold mb-1">Haz clic para subir archivos</div>
+        <div class="text-slate-500 text-xs">o arrastra y suelta aquí. Máx ${formatBytes(MAX_FILE_SIZE)}.</div>
+        <input type="file" id="file-input" multiple onchange="subirArchivos(this.files)" class="hidden">
+      </label>
+      <div id="upload-progress" class="hidden mb-6 p-4 bg-slate-950 border border-slate-800 rounded-2xl">
+        <div class="flex justify-between items-center text-xs text-slate-400 mb-2"><span id="progress-text">Subiendo...</span><span id="progress-pct">0%</span></div>
+        <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden"><div id="progress-bar" class="bg-gradient-to-r from-indigo-500 to-indigo-400 h-full transition-all duration-200" style="width:0%"></div></div>
+      </div>
+      <div id="archivos-lista">${list.length ? `<div class="text-center py-10 text-slate-500 text-sm">Generando enlaces seguros...</div>` : `<div class="text-center py-10 text-slate-500 text-sm">Aún no has subido archivos. Arrastra tus primeros archivos arriba.</div>`}</div>
+    </div>`;
+  const dz = document.getElementById('dropzone');
+  if(dz){
+    ['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('border-indigo-500','bg-indigo-500/5'); }));
+    ['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('border-indigo-500','bg-indigo-500/5'); }));
+    dz.addEventListener('drop', e => { e.preventDefault(); if(e.dataTransfer.files.length) subirArchivos(e.dataTransfer.files); });
+  }
+  if(!list.length) return;
+  try {
+    const paths = list.map(a => a.path).filter(Boolean);
+    const signedMap = {};
+    if(paths.length){
+      const { data, error } = await sb.storage.from(BUCKET).createSignedUrls(paths, SIGNED_URL_EXPIRY);
+      if(error){ console.error('Error generando URLs firmadas:', error); toast('No se pudieron generar los enlaces de descarga', 'error'); }
+      else { (data || []).forEach(d => { signedMap[d.path] = d.signedUrl; }); }
+    }
+    const cardsHTML = list.map(a => {
+      const sz = formatBytes(a.tamano);
+      const url = signedMap[a.path] || '#';
+      const isImg = (a.tipo||'').startsWith('image/');
+      const isVideo = (a.tipo||'').startsWith('video/');
+      const disabled = url === '#' ? 'opacity-60 pointer-events-none' : '';
+      return `<div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition group">
+        ${isImg ? `<div class="w-full h-36 bg-slate-950 flex items-center justify-center overflow-hidden"><img src="${url}" alt="${esc(a.nombre)}" class="w-full h-full object-cover"></div>`
+        : isVideo ? `<div class="w-full h-36 bg-slate-950 flex items-center justify-center text-5xl">🎬</div>`
+        : `<div class="w-full h-36 bg-slate-950 flex items-center justify-center text-5xl">${fileIcon(a.tipo)}</div>`}
+        <div class="p-4">
+          <div class="text-xs font-semibold text-white truncate" title="${esc(a.nombre)}">${esc(a.nombre)}</div>
+          <div class="text-[10px] text-slate-500 mt-1">${sz} · ${new Date(a.created_at).toLocaleDateString('es-CO')}</div>
+          <div class="flex gap-2 mt-3 ${disabled}">
+            <a href="${url}" target="_blank" class="${BTN_SM} flex-1 text-center" title="Ver">👁</a>
+            <a href="${url}" download="${esc(a.nombre)}" class="${BTN_SM} flex-1 text-center" title="Descargar">↓</a>
+            <button onclick="eliminarArchivo('${a.id}')" class="${BTN_SM} hover:bg-red-950/60" title="Eliminar">🗑️</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+    const lista = document.getElementById('archivos-lista');
+    if(lista) lista.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">${cardsHTML}</div>`;
+  } catch(e){
+    console.error('Error general renderArchivos:', e);
+    const lista = document.getElementById('archivos-lista');
+    if(lista) lista.innerHTML = `<div class="text-center py-10 text-red-400 text-sm">Error generando enlaces: ${esc(e.message)}</div>`;
+  }
+}
+async function subirArchivos(files){
+  if(!files || !files.length) return;
+  const progressEl = document.getElementById('upload-progress');
+  const progressBar = document.getElementById('progress-bar');
+  const progressText = document.getElementById('progress-text');
+  const progressPct = document.getElementById('progress-pct');
+  progressEl.classList.remove('hidden');
+  progressBar.style.width = '0%';
+  progressPct.textContent = '0%';
+  let completed = 0;
+  const total = files.length;
+  let errores = 0;
+  for (const file of Array.from(files)) {
+    if (file.size > MAX_FILE_SIZE) { toast(`"${file.name}" excede ${formatBytes(MAX_FILE_SIZE)}`, 'error'); errores++; completed++; continue; }
+    progressText.textContent = `Subiendo: ${file.name}`;
+    const pct = Math.round((completed / total) * 100);
+    progressBar.style.width = pct + '%';
+    progressPct.textContent = pct + '%';
+    try {
+      const ext = file.name.split('.').pop();
+      const baseName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const fileName = `${Date.now()}_${baseName}.${ext}`;
+      const path = `${CURRENT_USER.id}/${fileName}`;
+      const { error: uploadError } = await sb.storage.from(BUCKET).upload(path, file, { cacheControl: '3600', upsert: false, contentType: file.type });
+      if (uploadError) throw uploadError;
+      await Store.add('archivos', { nombre: file.name, tipo: file.type, tamano: file.size, path: path }, CURRENT_USER.nombre);
+      completed++;
+    } catch(e){
+      console.error('Error subiendo archivo:', e);
+      toast(`Error subiendo "${file.name}": ${e.message}`, 'error');
+      errores++;
+      completed++;
+    }
+  }
+  progressBar.style.width = '100%';
+  progressPct.textContent = '100%';
+  setTimeout(() => { progressEl.classList.add('hidden'); progressBar.style.width = '0%'; }, 800);
+  if(errores === 0) toast(`${total} archivo(s) subido(s) exitosamente`);
+  else toast(`${total - errores} de ${total} archivo(s) subidos`, errores === total ? 'error' : 'success');
+  logActivity(`Subió ${total - errores} archivo(s)`);
+  renderArchivos();
+}
+async function eliminarArchivo(id){
+  const archivo = Store.find('archivos', id);
+  if(!archivo){ toast('El archivo ya no existe', 'error'); renderArchivos(); return; }
+  if(!confirmar(`¿Eliminar "${archivo.nombre}"?\n\nEsta acción no se puede deshacer.`)) return;
+  let storageOK = true;
+  let tableOK = true;
+  let errores = [];
+  if(archivo.path){
+    const { error: storageError } = await sb.storage.from(BUCKET).remove([archivo.path]);
+    if(storageError){ console.warn('Error Storage:', storageError); storageOK = false; errores.push('Storage: ' + storageError.message); }
+  }
+  const { error: tableError } = await sb.from('archivos').delete().eq('id', id);
+  if(tableError){ console.error('Error tabla:', tableError); tableOK = false; errores.push('Tabla: ' + tableError.message); }
+  else { DB_CACHE.archivos = DB_CACHE.archivos.filter(x => String(x.id) !== String(id)); }
+  if(storageOK && tableOK){ toast('Archivo eliminado'); logActivity(`Eliminó el archivo "${archivo.nombre}"`); }
+  else if(tableOK){ toast('Eliminado de la lista (no se pudo borrar del storage)', 'error'); }
+  else { toast('Error al eliminar: ' + errores.join(' | '), 'error'); return; }
+  renderArchivos();
+}
+
+function calcNotifs(){
+  const hoy = todayStr();
+  const en7 = toLocalDateStr(addDays(new Date(),7));
+  const notifs = [];
+  Store.all('pagos').forEach(p=>{
+    if(p.estado==='Al día') return;
+    if(p.fecha_vencimiento&&p.fecha_vencimiento<hoy) notifs.push({icon:'💳',titulo:'Pago vencido',msg:`${p.servicio} — ${clienteName(p.cliente_id)}`,fecha:p.fecha_vencimiento});
+    else if(p.fecha_vencimiento&&p.fecha_vencimiento<=en7) notifs.push({icon:'💳',titulo:'Pago por vencer',msg:`${p.servicio} — ${clienteName(p.cliente_id)}`,fecha:p.fecha_vencimiento});
+  });
+  Store.all('tareas').forEach(t=>{ if(t.estado==='Hecho'||!t.fecha_limite) return; if(t.fecha_limite<hoy) notifs.push({icon:'✅',titulo:'Tarea atrasada',msg:`${t.titulo} — ${t.responsable||'sin resp.'}`,fecha:t.fecha_limite}); });
+  Store.all('eventos').forEach(e=>{ if(e.fecha>=hoy&&e.fecha<=en7) notifs.push({icon:'📅',titulo:'Evento próximo',msg:`${e.detalle} — ${clienteName(e.cliente_id)}`,fecha:e.fecha}); });
+  Store.all('contenido').forEach(c=>{ if(c.fecha_publicacion===hoy&&c.estado!=='Publicado') notifs.push({icon:'🎨',titulo:'Contenido para hoy',msg:`${c.titulo} — ${clienteName(c.cliente_id)}`,fecha:c.fecha_publicacion}); });
+  return notifs;
+}
+function renderNotificaciones(){
+  const v = document.getElementById('view-notificaciones');
+  const list = calcNotifs();
+  if(v) v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Notificaciones</h1><p class="text-slate-400 text-sm mt-2">Alertas automáticas del sistema.</p></div>
+    </div>
+    <div class="ui-card p-5 sm:p-7 rounded-3xl shadow-lg">
+      ${list.length?list.map(n=>`<div class="flex gap-4 py-4 border-b border-slate-800/60"><div class="text-2xl">${n.icon}</div><div><div class="font-semibold text-white text-sm">${esc(n.titulo)}</div><div class="text-slate-400 text-xs mt-1">${esc(n.msg)}</div><div class="text-slate-500 text-[11px] mt-1.5">📅 ${n.fecha}</div></div></div>`).join(''):'<div class="text-center py-10 text-slate-500 text-sm">Sin notificaciones</div>'}
+    </div>`;
+  const badge = document.getElementById('notif-badge');
+  if(badge){ badge.textContent = list.length; badge.classList.toggle('hidden', !list.length); }
+  const np = document.getElementById('notif-list');
+  if(np) np.innerHTML = list.length?list.slice(0,10).map(n=>`<div class="p-3.5 bg-slate-950/60 border border-slate-800 rounded-2xl"><div class="flex justify-between"><h5 class="font-bold text-white text-xs">${n.icon} ${esc(n.titulo)}</h5><span class="text-[10px] text-slate-500">${n.fecha}</span></div><p class="text-xs text-slate-400 mt-1.5">${esc(n.msg)}</p></div>`).join(''):'<p class="text-center text-slate-500 py-5 text-xs">Sin notificaciones</p>';
+}
+function toggleNotifPanel(e){ e.stopPropagation(); document.getElementById('notif-panel').classList.toggle('hidden'); }
+function closeNotifPanel(){ document.getElementById('notif-panel').classList.add('hidden'); }
+document.addEventListener('click',()=>closeNotifPanel());
+
+function renderAutomatizaciones(){
+  if(CURRENT_USER?.rol!=='dueño' && CURRENT_USER?.rol!=='administrador') return;
+  const v = document.getElementById('view-automatizaciones');
+  const reglas = [
+    {id:'rule_1',nombre:'Evento en menos de 7 días',descripcion:'Genera una tarea de preparación de publicidad',activa:true},
+    {id:'rule_4',nombre:'Tarea atrasada',descripcion:'Marca la tarea con prioridad alta',activa:true}
+  ];
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Automatizaciones</h1><p class="text-slate-400 text-sm mt-2">Reglas del lado del cliente.</p></div>
+      <button onclick="ejecutarAutomatizaciones(true)" class="${BTN_GHOST}">Ejecutar ahora</button>
+    </div>
+    <div class="ui-card p-5 sm:p-7 rounded-3xl shadow-lg">
+      <h3 class="font-bold text-white mb-4">Reglas automáticas</h3>
+      ${reglas.map(r=>`<div class="flex items-center justify-between gap-3 p-4 border border-slate-800 rounded-2xl mb-3"><div><div class="font-semibold text-white text-sm">${esc(r.nombre)}</div><div class="text-slate-500 text-xs mt-0.5">${esc(r.descripcion)}</div></div><span class="px-4 py-2 rounded-xl text-xs font-semibold ${r.activa?'bg-emerald-950 text-emerald-300 border border-emerald-900':'bg-slate-800 text-slate-400 border border-slate-700'}">${r.activa?'Activa':'Inactiva'}</span></div>`).join('')}
+    </div>
+    <div class="ui-card p-5 sm:p-7 rounded-3xl shadow-lg">
+      <h3 class="font-bold text-white mb-4">Historial</h3>
+      ${Store.all('actividad').filter(a=>a.user_name==='Automatización').slice(0,15).map(l=>`<div class="py-3 border-b border-slate-800/60 text-sm">${esc(l.accion)} <span class="text-slate-500 text-xs">· ${new Date(l.created_at).toLocaleString('es-CO')}</span></div>`).join('')||'<div class="text-slate-500 text-center py-6 text-sm">Sin ejecuciones</div>'}
+    </div>`;
+}
+let _autosRanThisSession = false;
+async function ejecutarAutomatizaciones(manual){
+  if(!CURRENT_USER){ return; }
+  if(_autosRanThisSession && !manual) return;
+  _autosRanThisSession = true;
+  const hoy = todayStr();
+  const en7 = toLocalDateStr(addDays(new Date(),7));
+  const tag = '🤖';
+  let creadas = 0;
+  const eventosProx = Store.all('eventos').filter(e => e.fecha >= hoy && e.fecha <= en7);
+  for(const e of eventosProx){
+    const titulo = `${tag} Preparar publicidad: ${e.detalle}`;
+    const yaExiste = Store.all('tareas').some(t => t.titulo === titulo);
+    if(yaExiste) continue;
+    const res = await Store.add('tareas', { titulo, cliente_id: e.cliente_id, local_id: e.local_id, fecha_limite: e.fecha, estado: 'Pendiente', prioridad: 'alta', descripcion: 'Generada automáticamente por evento próximo (≤7 días).' }, 'Automatización');
+    if(res) creadas++;
+  }
+  for(const t of Store.all('tareas')){
+    if(t.estado === 'Hecho') continue;
+    if(!t.fecha_limite) continue;
+    if(t.fecha_limite >= hoy) continue;
+    if(t.prioridad === 'alta') continue;
+    await Store.update('tareas', t.id, { prioridad: 'alta' }, 'Automatización');
+  }
+  if(creadas > 0){ toast(`${creadas} tarea(s) generada(s) por automatizaciones`); try { renderAll(); } catch(e){} }
+  else if(manual){ toast('Automatizaciones ejecutadas. Sin cambios nuevos.'); }
+}
+
+let USERS_CACHE = [];
+async function callEdge(action, payload = {}){
+  const { data: { session } } = await sb.auth.getSession();
+  const res = await fetch(EDGE_URL, { method: 'POST', headers: { 'Authorization': 'Bearer ' + (session?.access_token || ''), 'Content-Type': 'application/json' }, body: JSON.stringify({ action, payload }) });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || 'Error en el servidor');
+  return json;
+}
+async function renderUsuarios(){
+  const v = document.getElementById('view-usuarios');
+  const esDueño = CURRENT_USER?.rol === 'dueño';
+  v.innerHTML = `<div class="flex items-center justify-center py-20 text-slate-500">Cargando usuarios...</div>`;
+  try { const { users } = await callEdge('list'); USERS_CACHE = users || []; }
+  catch (e) {
+    v.innerHTML = `<div class="${HEADER_VIEW}"><div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Usuarios</h1></div></div><div class="bg-red-950/40 border border-red-900/50 p-5 rounded-2xl text-red-300 text-sm">❌ Error cargando usuarios: ${esc(e.message)}</div>`;
+    return;
+  }
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Usuarios</h1><p class="text-slate-400 text-sm mt-2">Crea, edita y elimina cuentas del equipo.</p></div>
+      <button onclick="abrirFormUsuario()" class="${BTN_PRIMARY}">+ Nuevo Usuario</button>
+    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-8">
+      <div class="ui-card p-5 sm:p-7 rounded-3xl shadow-lg overflow-x-auto">
+        <h3 class="font-bold text-white mb-4">Equipo con acceso (${USERS_CACHE.length})</h3>
+        <table class="w-full text-left text-sm">
+          <thead><tr class="text-[11px] font-bold text-slate-500 uppercase border-b border-slate-800"><th class="py-3">Usuario</th><th class="py-3">Rol</th><th class="py-3">Último acceso</th>${esDueño?'<th class="py-3">Estado</th>':''}<th class="py-3 text-right">Acciones</th></tr></thead>
+          <tbody class="divide-y divide-slate-800/60">
+            ${USERS_CACHE.map(u=>{
+              const pres = esDueño ? presenciaDe(u.id) : null;
+              const enLinea = !!pres;
+              const fechaAcceso = u.last_sign_in_at ? new Date(u.last_sign_in_at) : null;
+              const accesoTxt = fechaAcceso ? (esDueño
+                ? `${fechaAcceso.toLocaleDateString('es-CO')} · ${fechaAcceso.toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}`
+                : fechaAcceso.toLocaleDateString('es-CO')) : 'Nunca';
+              const estadoCell = esDueño ? `<td class="py-3.5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${enLinea?'bg-emerald-950 text-emerald-300 border border-emerald-900':'bg-slate-800 text-slate-400 border border-slate-700'}">
+                  <span class="w-1.5 h-1.5 rounded-full ${enLinea?'bg-emerald-400 animate-pulse':'bg-slate-500'}"></span>
+                  ${enLinea?'En línea':'Desconectado'}
+                </span>
+                ${enLinea && pres.conectado_desde ? `<div class="text-[10px] text-slate-500 mt-1">desde ${new Date(pres.conectado_desde).toLocaleTimeString('es-CO',{hour:'2-digit',minute:'2-digit'})}</div>` : ''}
+              </td>` : '';
+              return `<tr>
+                <td class="py-3.5"><div class="text-white font-semibold">${esc(u.nombre_completo || '—')}</div><div class="text-slate-400 text-xs">${esc(u.email)}</div></td>
+                <td class="py-3.5"><span class="px-2.5 py-1 text-[10px] font-bold rounded-full bg-slate-800 text-slate-300 uppercase">${ROLE_LABEL[u.rol]||u.rol}</span></td>
+                <td class="py-3.5 text-slate-400 text-xs">${accesoTxt}</td>
+                ${estadoCell}
+                <td class="py-3.5 text-right">${String(u.id) !== String(CURRENT_USER.id) ? `<button onclick="abrirResetPassword('${u.id}')" class="${BTN_SM}" title="Cambiar contraseña">🔑</button><button onclick="abrirCambiarRol('${u.id}')" class="${BTN_SM}" title="Cambiar rol">🎭</button><button onclick="eliminarUsuarioApp('${u.id}')" class="${BTN_SM} hover:bg-red-950/60 hover:text-red-400" title="Eliminar">🗑️</button>` : '<span class="text-slate-500 text-[10px]">Tú</span>'}</td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="ui-card p-5 sm:p-7 rounded-3xl shadow-lg space-y-4">
+        <h3 class="font-bold text-white">Información</h3>
+        <p class="text-sm text-slate-400">Desde aquí puedes:</p>
+        <ul class="text-sm text-slate-400 space-y-2 list-disc list-inside">
+          <li>Crear nuevos usuarios con email y contraseña</li>
+          <li>Cambiar la contraseña de cualquier usuario</li>
+          <li>Cambiar el rol de cualquier usuario</li>
+          <li>Eliminar usuarios (excepto tu propia cuenta)</li>
+        </ul>
+        <div class="border-t border-slate-800 pt-4 mt-4">
+          <p class="text-xs text-slate-500">Roles disponibles:</p>
+          <div class="flex flex-wrap gap-2 mt-2">${ROLES.map(r=>`<span class="px-2 py-1 rounded-lg bg-slate-800 text-slate-300 text-[10px] font-semibold">${ROLE_LABEL[r]}</span>`).join('')}</div>
+        </div>
+      </div>
+    </div>
+    <div class="ui-card p-5 sm:p-7 rounded-3xl shadow-lg">
+      <h3 class="font-bold text-white mb-4">Historial de cambios de acceso</h3>
+      ${(()=>{let log=[];try{log=JSON.parse(localStorage.getItem('bf_changelog_v5')||'[]');}catch(e){} return log.length?log.map(l=>`<div class="py-3 border-b border-slate-800/60 text-xs"><b class="text-white">${esc(l.actor)}</b> — ${esc(l.accion)} <span class="text-slate-500">· ${l.fecha}</span></div>`).join(''):'<div class="text-slate-500 text-center py-6 text-sm">Sin cambios</div>';})()}
+    </div>`;
+}
+function abrirFormUsuario(){
+  openForm({
+    title: 'Nuevo Usuario',
+    fields: [
+      {name:'nombre', label:'Nombre completo', required:true, placeholder:'Ej: Laura Méndez'},
+      {name:'email', label:'Correo electrónico', type:'email', required:true, placeholder:'laura@proyect.com'},
+      {name:'password', label:'Contraseña', type:'password', required:true, placeholder:'Mínimo 6 caracteres'},
+      {name:'rol', label:'Rol', type:'select', required:true, options: ROLES.map(r=>({value:r, label:ROLE_LABEL[r]}))}
+    ],
+    submitLabel: 'Crear usuario',
+    async onSubmit(d){
+      if(!d.nombre || !d.email || !d.password){ toast('Completa todos los campos','error'); return false; }
+      if(d.password.length < 6){ toast('La contraseña debe tener mínimo 6 caracteres','error'); return false; }
+      try{
+        await callEdge('create', { nombre: d.nombre, email: d.email, password: d.password, rol: d.rol });
+        logChange(CURRENT_USER.nombre, `Creó al usuario "${d.email}" con rol ${ROLE_LABEL[d.rol]}`);
+        toast('Usuario creado exitosamente'); renderUsuarios();
+      }catch(e){ toast('Error: ' + e.message, 'error'); return false; }
+    }
+  });
+}
+function abrirResetPassword(userId){
+  const u = USERS_CACHE.find(x => String(x.id) === String(userId));
+  if(!u) return;
+  openForm({
+    title: `Cambiar contraseña — ${u.nombre_completo || u.email}`,
+    fields: [{name:'new_password', label:'Nueva contraseña', type:'password', required:true, placeholder:'Mínimo 6 caracteres'}],
+    submitLabel: 'Cambiar contraseña',
+    async onSubmit(d){
+      if(!d.new_password || d.new_password.length < 6){ toast('Mínimo 6 caracteres','error'); return false; }
+      try{
+        await callEdge('update-password', { user_id: userId, new_password: d.new_password });
+        logChange(CURRENT_USER.nombre, `Cambió la contraseña de "${u.email}"`);
+        toast('Contraseña actualizada'); renderUsuarios();
+      }catch(e){ toast('Error: ' + e.message, 'error'); return false; }
+    }
+  });
+}
+function abrirCambiarRol(userId){
+  const u = USERS_CACHE.find(x => String(x.id) === String(userId));
+  if(!u) return;
+  openForm({
+    title: `Cambiar rol — ${u.nombre_completo || u.email}`,
+    initial: { rol: u.rol },
+    fields: [{name:'rol', label:'Nuevo rol', type:'select', required:true, options: ROLES.map(r=>({value:r, label:ROLE_LABEL[r]}))}],
+    submitLabel: 'Cambiar rol',
+    async onSubmit(d){
+      try{
+        await callEdge('update-rol', { user_id: userId, rol: d.rol });
+        logChange(CURRENT_USER.nombre, `Cambió el rol de "${u.email}" a ${ROLE_LABEL[d.rol]}`);
+        toast('Rol actualizado'); renderUsuarios();
+      }catch(e){ toast('Error: ' + e.message, 'error'); return false; }
+    }
+  });
+}
+async function eliminarUsuarioApp(userId){
+  const u = USERS_CACHE.find(x => String(x.id) === String(userId));
+  if(!u) return;
+  if(!confirmar(`¿Eliminar al usuario "${u.nombre_completo || u.email}"?\n\nEsta acción no se puede deshacer.`)) return;
+  try{
+    await callEdge('delete', { user_id: userId });
+    logChange(CURRENT_USER.nombre, `Eliminó al usuario "${u.email}"`);
+    toast('Usuario eliminado'); renderUsuarios();
+  }catch(e){ toast('Error: ' + e.message, 'error'); }
+}
+
+function renderMiCuenta(){
+  const v = document.getElementById('view-cuenta');
+  if(!v) return;
+  v.innerHTML = `
+    <div class="${HEADER_VIEW}">
+      <div><h1 class="text-xl sm:text-2xl font-bold text-white tracking-tight">Mi Cuenta</h1><p class="text-slate-400 text-sm mt-2">Cambia tu contraseña.</p></div>
+    </div>
+    <div class="ui-card p-5 sm:p-7 rounded-3xl shadow-lg max-w-lg space-y-4">
+      <div><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Email</label><input value="${esc(CURRENT_USER.email)}" disabled class="${INPUT} opacity-60"></div>
+      <div><label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Nueva contraseña</label><input id="mi-pass-nueva" type="password" placeholder="Déjala vacía si no cambia" class="${INPUT}"></div>
+      <button onclick="guardarMiCuenta()" class="${BTN_PRIMARY} w-full">Guardar cambios</button>
+      <div id="mi-msg" class="text-xs"></div>
+    </div>`;
+}
+async function guardarMiCuenta(){
+  const np = document.getElementById('mi-pass-nueva').value;
+  const msg = document.getElementById('mi-msg');
+  if(!np || np.length<6){ msg.style.color='#f87171'; msg.textContent='Mínimo 6 caracteres.'; return; }
+  const { error } = await sb.auth.updateUser({ password: np });
+  if(error){ msg.style.color='#f87171'; msg.textContent = error.message; return; }
+  msg.style.color='#34d399'; msg.textContent='Cambios guardados.';
+  toast('Cuenta actualizada');
+}
+
+async function logActivity(accion){
+  try{
+    await sb.from('actividad').insert({ user_id: CURRENT_USER?.id || null, user_name: CURRENT_USER?.nombre || '—', accion });
+    const { data } = await sb.from('actividad').select('*').order('created_at', { ascending: false }).limit(50);
+    DB_CACHE.actividad = data || [];
+  }catch(e){ console.warn('No se pudo loguear actividad', e); }
+}
+
+function doSearch(q){
+  const dd = document.getElementById('search-dropdown');
+  if(!q||q.length<2){ dd.classList.add('hidden'); return; }
+  const lq = q.toLowerCase();
+  const hits = [];
+  const push = (sec, editFn, id, tipo, texto, sub) => hits.push({sec, editFn, id, tipo, texto, sub});
+
+  Store.all('clientes').forEach(c=>{ if((c.nombre||'').toLowerCase().includes(lq)||(c.contacto||'').toLowerCase().includes(lq)) push('clientes','editarCliente',c.id,'Cliente',c.nombre,c.estado); });
+  Store.all('locales').forEach(l=>{ if((l.nombre||'').toLowerCase().includes(lq)) push('empresas','editarLocal',l.id,'Local',l.nombre,`Cliente: ${clienteName(l.cliente_id)}`); });
+  Store.all('servicios').forEach(s=>{ if((s.nombre||'').toLowerCase().includes(lq)) push('servicios','editarServicio',s.id,'Servicio',s.nombre,s.categoria); });
+  Store.all('proyectos').forEach(p=>{ if((p.nombre||'').toLowerCase().includes(lq)) push('proyectos','editarProyecto',p.id,'Proyecto',p.nombre,`${clienteName(p.cliente_id)} · ${p.estado}`); });
+  Store.all('tareas').forEach(t=>{ if((t.titulo||'').toLowerCase().includes(lq)) push('tareas','editarTarea',t.id,'Tarea',t.titulo,`${clienteName(t.cliente_id)} · ${t.estado}`); });
+  Store.all('eventos').forEach(e=>{ if((e.detalle||'').toLowerCase().includes(lq)) push('calendario','editarEvento',e.id,'Evento',e.detalle,`${e.fecha} · ${e.tipo}`); });
+  Store.all('pagos').forEach(p=>{ if((p.servicio||'').toLowerCase().includes(lq)) push('pagos','editarPago',p.id,'Pago',`${p.servicio} — ${clienteName(p.cliente_id)}`,`${p.precio} · ${p.estado}`); });
+  Store.all('crm').forEach(i=>{ if((i.nombre||'').toLowerCase().includes(lq)) push('crm','editarCRM',i.id,'CRM',i.nombre,i.etapa); });
+  Store.all('contenido').forEach(c=>{ if((c.titulo||'').toLowerCase().includes(lq)) push('contenido','editarContenido',c.id,'Contenido',c.titulo,`${c.plataforma} · ${c.estado}`); });
+  Store.all('comercial').forEach(c=>{ if((c.nombre||'').toLowerCase().includes(lq)) push('comercial','editarComercial',c.id,'Comercial',c.nombre,`${c.categoria} · ${localName(c.local_id)}`); });
+
+  if(!hits.length){
+    dd.innerHTML = `<div class="p-5 text-center text-slate-500 text-sm">Sin resultados para "${esc(q)}"</div>`;
+    dd.classList.remove('hidden');
+    return;
+  }
+  const groups = {};
+  hits.forEach(h => { (groups[h.tipo] = groups[h.tipo] || []).push(h); });
+  dd.innerHTML = `
+    <div class="p-4 border-b border-slate-800 text-xs font-bold text-white">${hits.length} resultado(s) para "${esc(q)}"</div>
+    ${Object.entries(groups).map(([tipo, items]) => `
+      <div class="p-4 border-b border-slate-800/60">
+        <div class="text-[10px] font-bold text-slate-500 uppercase mb-2">${tipo} (${items.length})</div>
+        ${items.slice(0,5).map(i => `
+          <button type="button" onclick="gotoSearchResult('${i.sec}','${i.editFn}','${i.id}')" class="w-full text-left py-2 px-3 rounded-xl hover:bg-slate-800/60 transition flex justify-between items-center gap-3">
+            <span class="min-w-0"><span class="text-white font-semibold text-sm block truncate">${esc(i.texto)}</span><span class="text-slate-500 text-xs block truncate">${esc(i.sub || '')}</span></span>
+            <span class="text-slate-500 text-xs shrink-0">→</span>
+          </button>`).join('')}
+      </div>`).join('')}`;
+  dd.classList.remove('hidden');
+}
+function gotoSearchResult(sec, editFn, id){
+  document.getElementById('search-dropdown').classList.add('hidden');
+  document.getElementById('global-search').value = '';
+  switchTab(sec);
+  setTimeout(() => { try { window[editFn](id); } catch(e){ console.warn('No se pudo abrir resultado:', e); } }, 300);
+}
+
+function renderAll(){
+  if(!CURRENT_USER) return;
+  renderDashboard();
+  if(can('clientes','view')) renderClientes();
+  if(can('empresas','view')) renderEmpresas();
+  if(can('servicios','view')) renderServicios();
+  if(can('pagos','view')) renderPagos();
+  if(can('proyectos','view')) renderProyectos();
+  if(can('tareas','view')) renderKanban();
+  if(can('contenido','view')) renderContenido();
+  if(can('comercial','view')) renderComercial();
+  if(can('calendario','view')) renderCalendario();
+  if(can('crm','view')) renderCRM();
+  if(can('archivos','view')) renderArchivos();
+  renderMiCuenta();
+  renderNotificaciones();
+  if(CURRENT_USER.rol==='dueño' || CURRENT_USER.rol==='administrador'){ renderUsuarios(); renderAutomatizaciones(); }
+}
+
+checkSession();
+
+window.addEventListener('online', () => { if(CURRENT_USER && !REALTIME_CHANNEL) initRealtime(); });
+window.addEventListener('offline', () => setRealtimeStatus('disconnected'));
+
+if('serviceWorker' in navigator){
+  let swRefrescando = false;
+
+  // Si el SW activo cambia (nueva versión tomó control), recarga una sola vez.
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if(swRefrescando) return;
+    swRefrescando = true;
+    window.location.reload();
+  });
+
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    // Revisa si hay una versión nueva cada vez que se carga la página
+    reg.update().catch(()=>{});
+
+    // Si ya hay un SW esperando (instalado pero no activo), actívalo ya
+    if(reg.waiting){
+      reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+    }
+
+    // Si se detecta una nueva versión mientras el usuario está usando la app
+    reg.addEventListener('updatefound', () => {
+      const nuevoSW = reg.installing;
+      if(!nuevoSW) return;
+      nuevoSW.addEventListener('statechange', () => {
+        if(nuevoSW.state === 'installed' && navigator.serviceWorker.controller){
+          // Hay una versión nueva lista: la activamos automáticamente
+          nuevoSW.postMessage({ type: 'SKIP_WAITING' });
+        }
+      });
+    });
+
+    // Revisa periódicamente si salió una versión nueva (cada 5 minutos)
+    setInterval(() => { reg.update().catch(()=>{}); }, 5 * 60 * 1000);
+  }).catch(e => console.warn('SW no registrado:', e));
+}
+</script>
+</body>
+</html>
